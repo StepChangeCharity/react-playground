@@ -23639,10 +23639,12 @@
 			var budget = DB.getBudget();
 			return budget;
 		},
+
 		componentDidMount: function componentDidMount() {
 			//var db = DB.getBudget();
 			//this.setState({ webNumber: this.state.WebNumber });
 		},
+
 		setAnswer: function setAnswer(event) {
 			var tar = event.target;
 			var key = tar.parentElement.parentElement.parentElement.className;
@@ -23656,6 +23658,14 @@
 
 			return this.setState({ CltWork: this.state.Income[key] });
 		},
+
+		saveIncome: function saveIncome(event) {
+			event.preventDefault();
+
+			// we're only going to localStorage, so just save the whole thing
+			DB.saveBudget(this.state);
+		},
+
 		render: function render() {
 			// Prompt: "",
 			// DataItem: "",
@@ -23666,21 +23676,26 @@
 				"div",
 				null,
 				React.createElement(
-					"h2",
-					null,
-					"Income"
-				),
-				React.createElement(
-					"ul",
+					"form",
 					null,
 					React.createElement(
-						"li",
+						"h2",
 						null,
-						React.createElement(AnswerLine, {
-							Answer: this.state.Income.CltWork,
-							onChange: this.setAnswer
-						})
-					)
+						"Income"
+					),
+					React.createElement(
+						"ul",
+						null,
+						React.createElement(
+							"li",
+							null,
+							React.createElement(AnswerLine, {
+								Answer: this.state.Income.CltWork,
+								onChange: this.setAnswer
+							})
+						)
+					),
+					React.createElement("input", { type: "submit", value: "Save", className: "btn btn-default", onClick: this.saveIncome })
 				)
 			);
 		}
@@ -23695,6 +23710,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
+	var Number = __webpack_require__(200);
 
 	// Prompt: "How much do you earn?",
 	// DataItem: "Clt.Work",
@@ -23714,27 +23730,16 @@
 				"div",
 				{ className: this.props.Answer.Key },
 				React.createElement("input", { type: "hidden", name: "Key", value: "{this.props.Answer.Key}" }),
+				React.createElement(Number, { name: "Amount", label: "Amount (£)",
+					value: this.props.Answer.Amount,
+					onChange: this.props.onChange
+				}),
 				React.createElement(
-					"ul",
-					null,
+					"div",
+					{ className: "form-group" },
 					React.createElement(
-						"li",
-						null,
-						React.createElement(
-							"label",
-							{ htmlFor: "Amount" },
-							this.props.Answer.Prompt
-						),
-						React.createElement("input", { type: "number", name: "Amount", ref: "Amount", value: this.props.Answer.Amount,
-							onChange: this.props.onChange
-						}),
-						" (£",
-						this.props.Answer.Amount,
-						")"
-					),
-					React.createElement(
-						"li",
-						null,
+						"div",
+						{ className: "field" },
 						React.createElement(
 							"label",
 							{ htmlFor: "Frequency" },
@@ -23758,6 +23763,11 @@
 								{ value: "3" },
 								"Yearly"
 							)
+						),
+						React.createElement(
+							"div",
+							{ className: "input" },
+							this.props.error
 						)
 					)
 				)
@@ -23766,6 +23776,63 @@
 	});
 
 	module.exports = AnswerLine;
+
+/***/ },
+/* 200 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	var Number = React.createClass({
+	  displayName: "Number",
+
+	  propTypes: {
+	    name: React.PropTypes.string.isRequired,
+	    label: React.PropTypes.string.isRequired,
+	    onChange: React.PropTypes.func.isRequired,
+	    placeholder: React.PropTypes.string,
+	    value: React.PropTypes.number,
+	    error: React.PropTypes.string
+	  },
+
+	  render: function render() {
+	    var wrapperClass = "form-group";
+	    if (this.props.error && this.props.error.length > 0) {
+	      wrapperClass += " " + "has-error";
+	    }
+
+	    return React.createElement(
+	      "div",
+	      { className: wrapperClass },
+	      React.createElement(
+	        "label",
+	        { htmlFor: this.props.name },
+	        this.props.label
+	      ),
+	      React.createElement(
+	        "div",
+	        { className: "field" },
+	        React.createElement("input", { type: "number",
+	          name: this.props.name,
+	          className: "form-control",
+	          placeholder: this.props.placeholder,
+	          ref: this.props.name,
+	          value: this.props.value,
+	          onChange: this.props.onChange
+	        }),
+	        React.createElement(
+	          "div",
+	          { className: "input" },
+	          this.props.error
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = Number;
 
 /***/ }
 /******/ ]);

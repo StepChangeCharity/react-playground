@@ -9,10 +9,12 @@ var income = React.createClass({
 		var budget = DB.getBudget();
 		return budget;
 	},
+
 	componentDidMount: function() {
 		//var db = DB.getBudget();
 		//this.setState({ webNumber: this.state.WebNumber });
 	},
+
 	setAnswer: function(event) {
 		var tar = event.target;
 		var key = tar.parentElement.parentElement.parentElement.className;
@@ -26,6 +28,14 @@ var income = React.createClass({
 
 		return this.setState( {CltWork: this.state.Income[key]} );
 	},
+
+	saveIncome: function(event) {
+		event.preventDefault();
+
+		// we're only going to localStorage, so just save the whole thing
+		DB.saveBudget(this.state);
+	},
+
 	render: function() {
 		// Prompt: "",
 		// DataItem: "",
@@ -34,15 +44,18 @@ var income = React.createClass({
 		// Comment: ""
 		return (
 			<div>
-				<h2>Income</h2>
-				<ul>
-					<li>
-						<AnswerLine
-							Answer={this.state.Income.CltWork}
-							onChange={this.setAnswer}
-						/>
-					</li>
-				</ul>
+				<form>
+					<h2>Income</h2>
+					<ul>
+						<li>
+							<AnswerLine
+								Answer={this.state.Income.CltWork}
+								onChange={this.setAnswer}
+							/>
+						</li>
+					</ul>
+					<input type="submit" value="Save" className="btn btn-default" onClick={this.saveIncome} />
+				</form>
 			</div>
 		)
 	}
