@@ -1,0 +1,35 @@
+<!DOCTYPE>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<style>
+		#menu, #content { border: solid 1px silver; }
+		#content { height: 100%; }
+	</style>
+</head>
+<body>
+	<div class="row">
+		<div id="menu" class="col-md-2">
+			<ol>
+				<li><a href="#/">Home</a></li>
+				<li><a href="#/debts">Debts</a></li>
+				<li><a href="#/assets">Assets</a></li>
+				<li><a href="#/income">Income</a></li>
+				<li><a href="#/expenditure">Expenditure</a></li>
+				<li><a href="#/advice">Advice</a></li>
+				<li><a href="#/home">You</a></li>
+			</ol>
+		</div>
+
+		<div id="content" class="col-md-10">
+			<div id="app"></div>
+		</div>
+	</div>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>	
+	<script src="./shims.js"></script>
+	<script src="./db.js"></script>
+	<script src="./bundle.js"></script>	
+</body>
+</html>
