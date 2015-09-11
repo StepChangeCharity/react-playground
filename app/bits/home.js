@@ -1,17 +1,18 @@
 "use strict";
 
 var React = require("react");
+var Db = require("../common/DB");
 
 var home = React.createClass({
 	getInitialState: function() {
-		var budget = DB.getBudget();
+		var budget = Db.getBudget();
 		return budget;
 	},
 	componentDidMount: function() {
 		// used to iniitalise the view, e.g. load some data from a web api end-point
 		// execution suspends until componentDidMount is completed
 	},
-	render: function() {		
+	render: function() {
 		return (
 			<div id="home">
 				<h2>Your Debt Remedy</h2>

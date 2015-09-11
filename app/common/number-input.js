@@ -8,7 +8,6 @@ var Number = React.createClass({
     label: React.PropTypes.string.isRequired,
     onChange: React.PropTypes.func.isRequired,
     placeholder: React.PropTypes.string,
-    value: React.PropTypes.number,
     error: React.PropTypes.string
   },
 
@@ -20,8 +19,8 @@ var Number = React.createClass({
 
     return (
       <div className={wrapperClass}>
-        <label htmlFor={this.props.name}>{this.props.label}</label>
         <div className="field">
+          <label htmlFor={this.props.name}>{this.props.label}</label>
           <input type="number"
             name={this.props.name}
             className="form-control"

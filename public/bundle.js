@@ -23549,7 +23549,7 @@
 
 	var React = __webpack_require__(1);
 	var home = __webpack_require__(197);
-	var income = __webpack_require__(198);
+	var income = __webpack_require__(199);
 	var Router = __webpack_require__(157);
 	var DefaultRoute = Router.DefaultRoute;
 	var Route = Router.Route;
@@ -23574,12 +23574,13 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
+	var Db = __webpack_require__(198);
 
 	var home = React.createClass({
 		displayName: "home",
 
 		getInitialState: function getInitialState() {
-			var budget = DB.getBudget();
+			var budget = Db.getBudget();
 			return budget;
 		},
 		componentDidMount: function componentDidMount() {
@@ -23624,24 +23625,76 @@
 
 /***/ },
 /* 198 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var DB = {
+
+		saveBudget: function saveBudget(data) {
+			var json = JSON.stringify(data);
+			window.localStorage.setItem("budget", json);
+			console.log("Budget saved.");
+		},
+
+		initBudget: function initBudget() {
+			var json = null;
+
+			$.ajax({
+				// Hey, we're just prototyping ... stop judging me !
+				async: false,
+				url: "http://localhost/react/data.js",
+				dataType: "json",
+				cache: false,
+				success: function success(data) {
+					DB.saveBudget(data);
+					console.log("Budget initialised.");
+				},
+				error: function error(xhr, status, err) {
+					console.log("error!", err);
+				}
+			});
+
+			return json;
+		},
+
+		getBudget: function getBudget() {
+			var db = window.localStorage["budget"];
+			if (db === undefined) {
+				db = this.initBudget();
+			} else {
+				var json = window.localStorage["budget"];
+				db = JSON.parse(json);
+				console.log("Budget loaded.");
+			}
+			return db;
+		}
+
+	};
+
+	module.exports = DB;
+
+/***/ },
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var React = __webpack_require__(1);
-	var AnswerLine = __webpack_require__(199);
+	var AnswerLine = __webpack_require__(200);
+	var Db = __webpack_require__(198);
 
 	var income = React.createClass({
 		displayName: "income",
 
 		getInitialState: function getInitialState() {
 			// NOTE: arrays look a PITA in react, going to just use objects for now
-			var budget = DB.getBudget();
+			var budget = Db.getBudget();
 			return budget;
 		},
 
 		componentDidMount: function componentDidMount() {
-			//var db = DB.getBudget();
+			//var Db = Db.getBudget();
 			//this.setState({ webNumber: this.state.WebNumber });
 		},
 
@@ -23656,14 +23709,14 @@
 			//this.state.DataItem[field] = value;
 			this.state.Income[key][field] = value;
 
-			return this.setState({ CltWork: this.state.Income[key] });
+			return this.setState({ key: this.state.Income[key] });
 		},
 
 		saveIncome: function saveIncome(event) {
 			event.preventDefault();
 
 			// we're only going to localStorage, so just save the whole thing
-			DB.saveBudget(this.state);
+			Db.saveBudget(this.state);
 		},
 
 		render: function render() {
@@ -23677,7 +23730,7 @@
 				null,
 				React.createElement(
 					"form",
-					null,
+					{ className: "form-inline" },
 					React.createElement(
 						"h2",
 						null,
@@ -23685,14 +23738,16 @@
 					),
 					React.createElement(
 						"ul",
-						null,
+						{ className: "list-group" },
 						React.createElement(
 							"li",
-							null,
-							React.createElement(AnswerLine, {
-								Answer: this.state.Income.CltWork,
-								onChange: this.setAnswer
-							})
+							{ className: "list-group-item" },
+							React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer })
+						),
+						React.createElement(
+							"li",
+							{ className: "list-group-item" },
+							React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer })
 						)
 					),
 					React.createElement("input", { type: "submit", value: "Save", className: "btn btn-default", onClick: this.saveIncome })
@@ -23704,13 +23759,14 @@
 	module.exports = income;
 
 /***/ },
-/* 199 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var React = __webpack_require__(1);
-	var Number = __webpack_require__(200);
+	var Number = __webpack_require__(201);
+	var Frequency = __webpack_require__(202);
 
 	// Prompt: "How much do you earn?",
 	// DataItem: "Clt.Work",
@@ -23726,51 +23782,22 @@
 			// between the virtual DOM (which is what "render") constructs and
 			// the actual DOM - see https://facebook.github.io/react/docs/more-about-refs.html
 
+			var groupName = this.props.Answer.Key;
+
 			return React.createElement(
 				"div",
-				{ className: this.props.Answer.Key },
-				React.createElement("input", { type: "hidden", name: "Key", value: "{this.props.Answer.Key}" }),
+				{ className: groupName },
+				React.createElement("input", { type: "hidden", name: "Key", value: groupName }),
 				React.createElement(Number, { name: "Amount", label: "Amount (£)",
+					defaultValue: this.props.Answer.Amount,
 					value: this.props.Answer.Amount,
 					onChange: this.props.onChange
 				}),
-				React.createElement(
-					"div",
-					{ className: "form-group" },
-					React.createElement(
-						"div",
-						{ className: "field" },
-						React.createElement(
-							"label",
-							{ htmlFor: "Frequency" },
-							"Frequency"
-						),
-						React.createElement(
-							"select",
-							{ ref: "Frequency", className: "form-control", onChange: this.props.onChange },
-							React.createElement(
-								"option",
-								{ value: "1" },
-								"Weekly"
-							),
-							React.createElement(
-								"option",
-								{ value: "2" },
-								"Monthly"
-							),
-							React.createElement(
-								"option",
-								{ value: "3" },
-								"Yearly"
-							)
-						),
-						React.createElement(
-							"div",
-							{ className: "input" },
-							this.props.error
-						)
-					)
-				)
+				React.createElement(Frequency, { name: "Frequency", label: "Frequency",
+					defaultValue: this.props.Answer.Frequency,
+					value: this.props.Answer.Frequency,
+					onChange: this.props.onChange
+				})
 			);
 		}
 	});
@@ -23778,7 +23805,7 @@
 	module.exports = AnswerLine;
 
 /***/ },
-/* 200 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23793,7 +23820,6 @@
 	    label: React.PropTypes.string.isRequired,
 	    onChange: React.PropTypes.func.isRequired,
 	    placeholder: React.PropTypes.string,
-	    value: React.PropTypes.number,
 	    error: React.PropTypes.string
 	  },
 
@@ -23807,13 +23833,13 @@
 	      "div",
 	      { className: wrapperClass },
 	      React.createElement(
-	        "label",
-	        { htmlFor: this.props.name },
-	        this.props.label
-	      ),
-	      React.createElement(
 	        "div",
 	        { className: "field" },
+	        React.createElement(
+	          "label",
+	          { htmlFor: this.props.name },
+	          this.props.label
+	        ),
 	        React.createElement("input", { type: "number",
 	          name: this.props.name,
 	          className: "form-control",
@@ -23833,6 +23859,100 @@
 	});
 
 	module.exports = Number;
+
+/***/ },
+/* 202 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	// [W]eekly
+	// [F]ornightly
+	// [4]-Weekly
+	// [M]onthly
+	// [Y]early
+
+	var Frequency = React.createClass({
+	  displayName: "Frequency",
+
+	  propTypes: {
+	    name: React.PropTypes.string.isRequired,
+	    label: React.PropTypes.string.isRequired,
+	    onChange: React.PropTypes.func.isRequired,
+	    value: React.PropTypes.string, // W/F/4/M/Y
+	    supports: React.PropTypes.string, // CSV of W/F/4/M/Y (empty gives all)
+	    error: React.PropTypes.string
+	  },
+
+	  getOption: function getOption(freqIndicator, id) {
+	    var value = -1,
+	        desc = "";
+
+	    switch (freqIndicator) {
+	      case "W":
+	        value = 1;desc = "Weekly";break;
+	      case "F":
+	        value = 2;desc = "Fortnightly";break;
+	      case "4":
+	        value = 3;desc = "4-Weekly";break;
+	      case "M":
+	        value = 4;desc = "Monthly";break;
+	      case "Y":
+	        value = 5;desc = "Yearly";break;
+	    }
+
+	    return React.createElement(
+	      "option",
+	      { key: id, value: desc },
+	      desc
+	    );
+	  },
+
+	  render: function render() {
+	    var wrapperClass = "form-group";
+	    if (this.props.error && this.props.error.length > 0) {
+	      wrapperClass += " " + "has-error";
+	    }
+
+	    var supports = this.props.supports;
+	    if (supports === undefined || supports.length == 0) {
+	      // nothing specified, so ensure all are supplied
+	      supports = "W/F/4/M/Y";
+	    }
+	    var arrSupports = supports.split("/");
+	    var options = arrSupports.map(function (opt, i) {
+	      return this.getOption(opt, i);
+	    }, this);
+
+	    return React.createElement(
+	      "div",
+	      { className: wrapperClass },
+	      React.createElement(
+	        "div",
+	        { className: "field" },
+	        React.createElement(
+	          "label",
+	          { htmlFor: this.props.name },
+	          this.props.label
+	        ),
+	        React.createElement(
+	          "select",
+	          { defaultValue: this.props.defaultValue, ref: "Frequency", name: this.props.name, className: "form-control", onChange: this.props.onChange },
+	          options
+	        ),
+	        React.createElement(
+	          "div",
+	          { className: "input" },
+	          this.props.error
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = Frequency;
 
 /***/ }
 /******/ ]);

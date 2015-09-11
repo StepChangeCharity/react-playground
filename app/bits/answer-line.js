@@ -1,7 +1,8 @@
 "use strict";
 
 var React = require("react");
-var Number = require("../common/number-input.js");
+var Number = require("../common/number-input");
+var Frequency = require("../common/frequency-input");
 
 // Prompt: "How much do you earn?",
 // DataItem: "Clt.Work",
@@ -15,26 +16,25 @@ var AnswerLine = React.createClass({
 		// between the virtual DOM (which is what "render") constructs and
 		// the actual DOM - see https://facebook.github.io/react/docs/more-about-refs.html
 
+		var groupName = this.props.Answer.Key;
+
 		return (
-			<div className={this.props.Answer.Key}>
-				<input type="hidden" name="Key" value="{this.props.Answer.Key}" />
+
+			<div className={groupName}>
+				<input type="hidden" name="Key" value={groupName} />
 
 				<Number name="Amount" label="Amount (&pound;)"
+					defaultValue={this.props.Answer.Amount}
 					value={this.props.Answer.Amount}
 					onChange={this.props.onChange}
 				/>
 
-				<div className="form-group">
-					<div className="field">
-						<label htmlFor="Frequency">Frequency</label>
-						<select ref="Frequency" className="form-control" onChange={this.props.onChange}>
-							<option value="1">Weekly</option>
-							<option value="2">Monthly</option>
-							<option value="3">Yearly</option>
-						</select>
-						<div className="input">{this.props.error}</div>
-					</div>
-				</div>
+				<Frequency name="Frequency" label="Frequency"
+					defaultValue={this.props.Answer.Frequency}
+					value={this.props.Answer.Frequency}
+					onChange={this.props.onChange}
+				/>
+
 			</div>
 		);
 	}
