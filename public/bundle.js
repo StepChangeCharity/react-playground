@@ -23635,19 +23635,20 @@
 			var json = JSON.stringify(data);
 			window.localStorage.setItem("budget", json);
 			console.log("Budget saved.");
+			return data;
 		},
 
 		initBudget: function initBudget() {
-			var json = null;
+			var db = null;
 
 			$.ajax({
 				// Hey, we're just prototyping ... stop judging me !
 				async: false,
-				url: "http://localhost/react/data.js",
+				url: "./data.js",
 				dataType: "json",
 				cache: false,
 				success: function success(data) {
-					DB.saveBudget(data);
+					db = DB.saveBudget(data);
 					console.log("Budget initialised.");
 				},
 				error: function error(xhr, status, err) {
@@ -23655,7 +23656,7 @@
 				}
 			});
 
-			return json;
+			return db;
 		},
 
 		getBudget: function getBudget() {
