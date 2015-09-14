@@ -3,6 +3,7 @@
 var React = require("react");
 var Number = require("../common/number-input");
 var Frequency = require("../common/frequency-input");
+var AmountSummary = require("../common/amount-summary");
 
 // Prompt: "How much do you earn?",
 // DataItem: "Clt.Work",
@@ -11,6 +12,7 @@ var Frequency = require("../common/frequency-input");
 // Comment: ""
 
 var AnswerLine = React.createClass({
+
 	render: function() {
 		// Re the "ref" thing below - this _seems_ to be a kind of reference
 		// between the virtual DOM (which is what "render") constructs and
@@ -35,6 +37,10 @@ var AnswerLine = React.createClass({
 					onChange={this.props.onChange}
 				/>
 
+				<AmountSummary
+					Amount={this.props.Answer.Amount}
+					Frequency={this.props.Answer.Frequency}
+				/>
 			</div>
 		);
 	}

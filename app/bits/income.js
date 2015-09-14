@@ -1,10 +1,15 @@
 "use strict";
 
 var React = require("react");
+var Router = require("react-router");
 var AnswerLine = require("./answer-line");
 var Db = require("../common/DB");
 
 var income = React.createClass({
+	mixins: [
+		Router.Navigation
+	],
+
 	getInitialState: function() {
 		// NOTE: arrays look a PITA in react, going to just use objects for now
 		var budget = Db.getBudget();
@@ -22,9 +27,6 @@ var income = React.createClass({
 		var field = tar.name;
 		var value = tar.value;
 
-		//debugger;
-
-		//this.state.DataItem[field] = value;
 		this.state.Income[key][field] = value;
 
 		return this.setState( {key: this.state.Income[key]} );
@@ -35,6 +37,8 @@ var income = React.createClass({
 
 		// we're only going to localStorage, so just save the whole thing
 		Db.saveBudget(this.state);
+
+		this.transitionTo("home");
 	},
 
 	render: function() {

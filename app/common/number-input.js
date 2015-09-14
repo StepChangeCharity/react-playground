@@ -11,10 +11,16 @@ var Number = React.createClass({
     error: React.PropTypes.string
   },
 
+  getInitialState: function() {
+    return {
+      error: {}
+    }
+  },
+
   render: function() {
     var wrapperClass = "form-group";
     if (this.props.error && this.props.error.length > 0) {
-      wrapperClass += " " + "has-error";
+      wrapperClass += " has-error";
     }
 
     return (

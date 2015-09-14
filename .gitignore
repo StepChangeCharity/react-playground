@@ -43,5 +43,6 @@ Temporary Items
 .apdisk
 
 # My exclusions
+npm-debug.log
 node_modules
 node_modules/babel-core/node_modules/core-js/library/modules/$.string-trim.js

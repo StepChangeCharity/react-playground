@@ -23681,11 +23681,14 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
+	var Router = __webpack_require__(157);
 	var AnswerLine = __webpack_require__(200);
 	var Db = __webpack_require__(198);
 
 	var income = React.createClass({
 		displayName: "income",
+
+		mixins: [Router.Navigation],
 
 		getInitialState: function getInitialState() {
 			// NOTE: arrays look a PITA in react, going to just use objects for now
@@ -23704,9 +23707,6 @@
 			var field = tar.name;
 			var value = tar.value;
 
-			//debugger;
-
-			//this.state.DataItem[field] = value;
 			this.state.Income[key][field] = value;
 
 			return this.setState({ key: this.state.Income[key] });
@@ -23717,6 +23717,8 @@
 
 			// we're only going to localStorage, so just save the whole thing
 			Db.saveBudget(this.state);
+
+			this.transitionTo("home");
 		},
 
 		render: function render() {
@@ -23767,6 +23769,7 @@
 	var React = __webpack_require__(1);
 	var Number = __webpack_require__(201);
 	var Frequency = __webpack_require__(202);
+	var AmountSummary = __webpack_require__(203);
 
 	// Prompt: "How much do you earn?",
 	// DataItem: "Clt.Work",
@@ -23797,6 +23800,10 @@
 					defaultValue: this.props.Answer.Frequency,
 					value: this.props.Answer.Frequency,
 					onChange: this.props.onChange
+				}),
+				React.createElement(AmountSummary, {
+					Amount: this.props.Answer.Amount,
+					Frequency: this.props.Answer.Frequency
 				})
 			);
 		}
@@ -23823,10 +23830,16 @@
 	    error: React.PropTypes.string
 	  },
 
+	  getInitialState: function getInitialState() {
+	    return {
+	      error: {}
+	    };
+	  },
+
 	  render: function render() {
 	    var wrapperClass = "form-group";
 	    if (this.props.error && this.props.error.length > 0) {
-	      wrapperClass += " " + "has-error";
+	      wrapperClass += " has-error";
 	    }
 
 	    return React.createElement(
@@ -23953,6 +23966,51 @@
 	});
 
 	module.exports = Frequency;
+
+/***/ },
+/* 203 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	var AmountSummary = React.createClass({
+		displayName: "AmountSummary",
+
+		getInitialState: function getInitialState() {
+			return {
+				Amount: 0,
+				Frequency: "Monthly"
+			};
+		},
+
+		getSummary: function getSummary(amount, frequency) {
+			var multiplier = 1;
+			var pcm = 0;
+
+			if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
+
+			pcm = (amount * multiplier).toFixed(2);
+
+			return pcm;
+		},
+
+		render: function render() {
+			var summary = this.getSummary(this.props.Amount, this.props.Frequency);
+
+			return React.createElement(
+				"span",
+				{ className: "monthly-amount" },
+				"£",
+				summary,
+				" pcm"
+			);
+		}
+
+	});
+
+	module.exports = AmountSummary;
 
 /***/ }
 /******/ ]);
