@@ -23694,7 +23694,11 @@
 		getInitialState: function getInitialState() {
 			// NOTE: arrays look a PITA in react, going to just use objects for now
 			var budget = Db.getBudget();
-			return budget;
+
+			return {
+				Budget: budget,
+				Errors: {}
+			};
 		},
 
 		componentDidMount: function componentDidMount() {
@@ -23703,21 +23707,36 @@
 		},
 
 		setAnswer: function setAnswer(event) {
-			var tar = event.target;
-			var key = tar.parentElement.parentElement.parentElement.className;
-			var field = tar.name;
-			var value = tar.value;
+			var field = event.target.name;
+			var value = event.target.value;
 
-			this.state.Income[key][field] = value;
+			// Find the underlying DataItem
+			var ele = event.target;
+			while (ele.dataset.key === undefined && ele.tagName !== "BODY") {
+				ele = ele.parentElement;
+			}
 
-			return this.setState({ key: this.state.Income[key] });
+			var dataItem = ele.dataset.key;
+
+			this.state.Budget.Income[dataItem][field] = value;
+
+			return this.setState({ key: this.state.Budget.Income[dataItem] });
+
+			// var tar = event.target;
+			// var key = tar.parentElement.parentElement.dataset.key;
+			// var field = tar.name;
+			// var value = tar.value;
+			//
+			// this.state.Budget.Income[key][field] = value;
+			//
+			// return this.setState( {key: this.state.Budget.Income[key]} );
 		},
 
 		saveIncome: function saveIncome(event) {
 			event.preventDefault();
 
 			// we're only going to localStorage, so just save the whole thing
-			Db.saveBudget(this.state);
+			Db.saveBudget(this.state.Budget);
 
 			// this.transitionTo("home");
 		},
@@ -23739,8 +23758,8 @@
 						null,
 						"Income"
 					),
-					React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer }),
-					React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer }),
+					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.CltWork, onChange: this.setAnswer }),
+					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.PtrWork, onChange: this.setAnswer }),
 					React.createElement(
 						"button",
 						{ type: "submit", className: "mui-btn mui-btn-default mui-btn-raised", onClick: this.saveIncome },
@@ -23763,6 +23782,7 @@
 	var Number = __webpack_require__(201);
 	var Frequency = __webpack_require__(202);
 	var AmountSummary = __webpack_require__(203);
+	var Utils = __webpack_require__(204);
 
 	// Prompt: "How much do you earn?",
 	// DataItem: "Clt.Work",
@@ -23772,6 +23792,71 @@
 
 	var AnswerLine = React.createClass({
 		displayName: "AnswerLine",
+
+		getInitialState: function getInitialState() {
+			return {
+				zoneErrors: [],
+				isAmountValid: true,
+				isFrequencyValid: true
+			};
+		},
+
+		// onError: function(errors) {
+		// 	this.state.zoneErrors = [];
+		// 	this.state.zoneErrors.push(errors);
+		// },
+
+		isAnswerValid: function isAnswerValid() {
+			var valid = true;
+			// reset error cache
+			this.state.zoneErrors = [];
+
+			var pcm = Utils.getSummary(this.props.Answer.Amount, this.props.Answer.Frequency);
+			if (pcm > 500) {
+				// es6 string template stuff no worky in react (extension can be installed)
+				var msg = "£" + pcm + " per calendar month is too many pounds.";
+				this.state.zoneErrors.push(msg);
+				valid = false;
+			}
+
+			return valid;
+		},
+
+		getZoneErrors: function getZoneErrors() {
+			var msgs = "";
+
+			if (!this.isAnswerValid()) {
+				msgs = "<ul class='zone-errors'>";
+				for (var i in this.state.zoneErrors) {
+					var msg = this.state.zoneErrors[i];
+					msgs += "<li>" + msg + "</li>";
+				}
+				msgs += "</ul>";
+			}
+
+			return {
+				__html: msgs
+			};
+		},
+
+		/// We have to validate a DataItem as group, the value maybe OK as a Yearly
+		/// amount, but not as a Monthly, so we calculate the PCM version and work with that
+		///
+		onDataItemChange: function onDataItemChange(event) {
+			this.props.onChange(event);
+
+			var isDataItemValid = this.isAnswerValid();
+
+			this.state.isAmountValid = isDataItemValid;
+			this.state.isFrequencyValid = isDataItemValid;
+		},
+
+		// 	onFrequencyChange: function(event) {
+		// 		this.props.onChange(event);
+		// debugger;
+		// 		this.state.isFrequencyValid = this.isAnswerValid();
+		// 	},
+		//
 
 		render: function render() {
 			// Re the "ref" thing below - this _seems_ to be a kind of reference
@@ -23783,22 +23868,24 @@
 			// 	Frequency={this.props.Answer.Frequency}
 			// />
 
-			var groupName = this.props.Answer.Key;
+			var ans = this.props.Answer;
 
 			return React.createElement(
 				"div",
-				{ className: groupName + " mui-panel" },
-				React.createElement("input", { type: "hidden", name: "Key", value: groupName }),
-				React.createElement(Number, { name: "Amount", label: this.props.Answer.Prompt,
-					defaultValue: this.props.Answer.Amount,
-					value: this.props.Answer.Amount,
-					onChange: this.props.onChange,
-					currentFrequency: this.props.Answer.Frequency
+				{ className: "mui-panel", "data-key": ans.Key },
+				React.createElement("div", { dangerouslySetInnerHTML: this.getZoneErrors() }),
+				React.createElement(Number, { name: "Amount", label: ans.Prompt,
+					defaultValue: ans.Amount,
+					value: ans.Amount,
+					onChange: this.onDataItemChange,
+					isValid: this.state.isAmountValid,
+					currentFrequency: ans.Frequency
 				}),
 				React.createElement(Frequency, { name: "Frequency", label: "Which is paid ...",
-					defaultValue: this.props.Answer.Frequency,
-					value: this.props.Answer.Frequency,
-					onChange: this.props.onChange
+					defaultValue: ans.Frequency,
+					value: ans.Frequency,
+					onChange: this.onDataItemChange,
+					isValid: this.state.isFrequencyValid
 				})
 			);
 		}
@@ -23813,6 +23900,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
+	var AccountSummary = __webpack_require__(203);
 
 	var Number = React.createClass({
 	  displayName: "Number",
@@ -23822,36 +23910,26 @@
 	    label: React.PropTypes.string.isRequired,
 	    onChange: React.PropTypes.func.isRequired,
 	    placeholder: React.PropTypes.string,
-	    error: React.PropTypes.string
+	    isValid: React.PropTypes.bool
 	  },
 
 	  getInitialState: function getInitialState() {
 	    return {
-	      error: {}
+	      isValid: true
 	    };
 	  },
 
-	  getSummary: function getSummary(amount, frequency) {
-	    var multiplier = 1;
-	    var pcm = 0;
-
-	    if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
-
-	    pcm = (amount * multiplier).toFixed(2);
-
-	    return pcm;
-	  },
-
 	  render: function render() {
-	    var wrapperClass = "";
-	    if (this.props.error && this.props.error.length > 0) {
-	      wrapperClass += " has-error";
-	    }
-	    var summary = "£" + this.getSummary(this.props.value, this.props.currentFrequency) + "pcm";
+	    var summary = React.createElement(AccountSummary, {
+	      Amount: this.props.value,
+	      Frequency: this.props.currentFrequency
+	    });
+	    var hideError = "";
+	    if (this.props.isValid) hideError = "mui-hide";
 
 	    return React.createElement(
 	      "div",
-	      { className: wrapperClass + " mui-form-group" },
+	      { className: "mui-form-group" },
 	      React.createElement(
 	        "label",
 	        { htmlFor: this.props.name },
@@ -23862,18 +23940,23 @@
 	          summary
 	        )
 	      ),
-	      React.createElement("input", { type: "number",
-	        name: this.props.name,
-	        className: "mui-form-control",
-	        placeholder: this.props.placeholder,
-	        ref: this.props.name,
-	        value: this.props.value,
-	        onChange: this.props.onChange
-	      }),
 	      React.createElement(
-	        "div",
-	        { className: "input" },
-	        this.props.error
+	        "span",
+	        null,
+	        React.createElement("input", { type: "number",
+	          name: this.props.name,
+	          className: "mui-form-control",
+	          placeholder: this.props.placeholder,
+	          ref: this.props.name,
+	          value: this.props.value,
+	          onChange: this.props.onChange,
+	          className: "pull-left half"
+	        }),
+	        React.createElement(
+	          "span",
+	          { className: hideError + " pull-right error-indicator" },
+	          "*"
+	        )
 	      )
 	    );
 	  }
@@ -23904,7 +23987,13 @@
 	    onChange: React.PropTypes.func.isRequired,
 	    value: React.PropTypes.string, // W/F/4/M/Y
 	    supports: React.PropTypes.string, // CSV of W/F/4/M/Y (empty gives all)
-	    error: React.PropTypes.string
+	    isValid: React.PropTypes.bool
+	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      isValid: true
+	    };
 	  },
 
 	  getOption: function getOption(freqIndicator, id) {
@@ -23932,11 +24021,6 @@
 	  },
 
 	  render: function render() {
-	    var wrapperClass = "mui-form-group";
-	    if (this.props.error && this.props.error.length > 0) {
-	      wrapperClass += " " + "has-error";
-	    }
-
 	    var supports = this.props.supports;
 	    if (supports === undefined || supports.length == 0) {
 	      // nothing specified, so ensure all are supplied
@@ -23947,24 +24031,31 @@
 	      return this.getOption(opt, i);
 	    }, this);
 
+	    var hideError = "";
+	    if (this.props.isValid) hideError = "mui-hide";
+
 	    return React.createElement(
 	      "div",
-	      { className: wrapperClass + " mui-form-group" },
+	      { className: "mui-form-group" },
 	      React.createElement(
 	        "label",
 	        { htmlFor: this.props.name },
 	        this.props.label
 	      ),
 	      React.createElement(
-	        "select",
-	        { defaultValue: this.props.defaultValue, ref: "Frequency",
-	          name: this.props.name, className: "mui-form-control", onChange: this.props.onChange },
-	        options
-	      ),
-	      React.createElement(
-	        "div",
-	        { className: "input" },
-	        this.props.error
+	        "span",
+	        null,
+	        React.createElement(
+	          "select",
+	          { defaultValue: this.props.defaultValue, ref: "Frequency",
+	            name: this.props.name, className: "pull-left mui-form-control half ib", onChange: this.props.onChange },
+	          options
+	        ),
+	        React.createElement(
+	          "span",
+	          { className: hideError + " pull-right error-indicator" },
+	          "*"
+	        )
 	      )
 	    );
 	  }
@@ -23979,6 +24070,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
+	var Utils = __webpack_require__(204);
 
 	var AmountSummary = React.createClass({
 		displayName: "AmountSummary",
@@ -23990,19 +24082,9 @@
 			};
 		},
 
-		getSummary: function getSummary(amount, frequency) {
-			var multiplier = 1;
-			var pcm = 0;
-
-			if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
-
-			pcm = (amount * multiplier).toFixed(2);
-
-			return pcm;
-		},
-
 		render: function render() {
-			var summary = this.getSummary(this.props.Amount, this.props.Frequency);
+
+			var summary = Utils.getSummary(this.props.Amount, this.props.Frequency);
 
 			return React.createElement(
 				"span",
@@ -24016,6 +24098,29 @@
 	});
 
 	module.exports = AmountSummary;
+
+/***/ },
+/* 204 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var Utils = {
+
+			getSummary: function getSummary(amount, frequency) {
+					var multiplier = 1;
+					var pcm = 0;
+
+					if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
+
+					pcm = (amount * multiplier).toFixed(2);
+
+					return pcm;
+			}
+
+	};
+
+	module.exports = Utils;
 
 /***/ }
 /******/ ]);

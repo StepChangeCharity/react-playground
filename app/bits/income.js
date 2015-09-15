@@ -13,7 +13,11 @@ var income = React.createClass({
 	getInitialState: function() {
 		// NOTE: arrays look a PITA in react, going to just use objects for now
 		var budget = Db.getBudget();
-		return budget;
+
+		return {
+			Budget: budget,
+			Errors: {}
+		}
 	},
 
 	componentDidMount: function() {
@@ -22,21 +26,38 @@ var income = React.createClass({
 	},
 
 	setAnswer: function(event) {
-		var tar = event.target;
-		var key = tar.parentElement.parentElement.parentElement.className;
-		var field = tar.name;
-		var value = tar.value;
+		var field = event.target.name;
+		var value = event.target.value;
 
-		this.state.Income[key][field] = value;
+		// Find the underlying DataItem
+		var ele = event.target;
+		while (ele.dataset.key === undefined && ele.tagName !== "BODY") {
+			ele = ele.parentElement;
+		}
 
-		return this.setState( {key: this.state.Income[key]} );
+		var dataItem = ele.dataset.key;
+
+		this.state.Budget.Income[dataItem][field] = value;
+
+		return this.setState( {key: this.state.Budget.Income[dataItem]} );
+
+
+
+		// var tar = event.target;
+		// var key = tar.parentElement.parentElement.dataset.key;
+		// var field = tar.name;
+		// var value = tar.value;
+		//
+		// this.state.Budget.Income[key][field] = value;
+		//
+		// return this.setState( {key: this.state.Budget.Income[key]} );
 	},
 
 	saveIncome: function(event) {
 		event.preventDefault();
 
 		// we're only going to localStorage, so just save the whole thing
-		Db.saveBudget(this.state);
+		Db.saveBudget(this.state.Budget);
 
 		// this.transitionTo("home");
 	},
@@ -51,9 +72,9 @@ var income = React.createClass({
 			<div>
 				<form>
 					<h2>Income</h2>
-					<AnswerLine Answer={this.state.Income.CltWork} onChange={this.setAnswer} />
+					<AnswerLine Answer={this.state.Budget.Income.CltWork} onChange={this.setAnswer} />
 
-					<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} />
+					<AnswerLine Answer={this.state.Budget.Income.PtrWork} onChange={this.setAnswer} />
 					<button type="submit" className="mui-btn mui-btn-default mui-btn-raised" onClick={this.saveIncome}>Save</button>
 				</form>
 			</div>

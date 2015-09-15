@@ -15,8 +15,15 @@ var Frequency = React.createClass({
     onChange: React.PropTypes.func.isRequired,
     value: React.PropTypes.string,  // W/F/4/M/Y
     supports: React.PropTypes.string, // CSV of W/F/4/M/Y (empty gives all)
-    error: React.PropTypes.string
+    isValid: React.PropTypes.bool
   },
+
+  getInitialState: function() {
+    return {
+      isValid: true
+    }
+  },
+
 
   getOption: function(freqIndicator, id) {
     var value = -1, desc = "";
@@ -33,11 +40,6 @@ var Frequency = React.createClass({
   },
 
   render: function() {
-    var wrapperClass = "mui-form-group";
-    if (this.props.error && this.props.error.length > 0) {
-      wrapperClass += " " + "has-error";
-    }
-
     var supports = this.props.supports;
     if (supports === undefined || supports.length == 0) {
       // nothing specified, so ensure all are supplied
@@ -48,16 +50,22 @@ var Frequency = React.createClass({
       return this.getOption(opt, i);
     }, this);
 
+    var hideError = "";
+    if (this.props.isValid)
+      hideError = "mui-hide";
+
     return (
-      <div className={wrapperClass + " mui-form-group"}>
+      <div className="mui-form-group">
         <label htmlFor={this.props.name}>{this.props.label}</label>
 
-        <select defaultValue={this.props.defaultValue} ref="Frequency"
-          name={this.props.name} className="mui-form-control" onChange={this.props.onChange}>
-          {options}
-        </select>
+        <span>
+          <select defaultValue={this.props.defaultValue} ref="Frequency"
+            name={this.props.name} className="pull-left mui-form-control half ib" onChange={this.props.onChange}>
+            {options}
+          </select>
 
-        <div className="input">{this.props.error}</div>
+          <span className={hideError + " pull-right error-indicator"}>*</span>
+        </span>
       </div>
     );
   }
