@@ -23690,6 +23690,13 @@
 		displayName: "income",
 
 		mixins: [Router.Navigation],
+		statics: {
+			willTransitionFrom: function willTransitionFrom(transition, component) {
+				if (component.state.dirty && !confirm("Leave without saving?")) {
+					transition.abort();
+				}
+			}
+		},
 
 		getInitialState: function getInitialState() {
 			// NOTE: arrays look a PITA in react, going to just use objects for now
@@ -23697,7 +23704,8 @@
 
 			return {
 				Budget: budget,
-				Errors: {}
+				Errors: {},
+				dirty: false
 			};
 		},
 
@@ -23719,17 +23727,9 @@
 			var dataItem = ele.dataset.key;
 
 			this.state.Budget.Income[dataItem][field] = value;
+			this.setState({ dirty: true });
 
 			return this.setState({ key: this.state.Budget.Income[dataItem] });
-
-			// var tar = event.target;
-			// var key = tar.parentElement.parentElement.dataset.key;
-			// var field = tar.name;
-			// var value = tar.value;
-			//
-			// this.state.Budget.Income[key][field] = value;
-			//
-			// return this.setState( {key: this.state.Budget.Income[key]} );
 		},
 
 		saveIncome: function saveIncome(event) {
@@ -23739,6 +23739,8 @@
 			Db.saveBudget(this.state.Budget);
 
 			// this.transitionTo("home");
+			// no longer dirty!
+			this.setState({ dirty: false });
 		},
 
 		render: function render() {
@@ -23792,6 +23794,11 @@
 
 	var AnswerLine = React.createClass({
 		displayName: "AnswerLine",
+
+		propTypes: {
+			Answer: React.PropTypes.object.isRequired,
+			onChange: React.PropTypes.func.isRequired
+		},
 
 		getInitialState: function getInitialState() {
 			return {
@@ -23851,22 +23858,10 @@
 			this.state.isFrequencyValid = isDataItemValid;
 		},
 
-		// 	onFrequencyChange: function(event) {
-		// 		this.props.onChange(event);
-		// debugger;
-		// 		this.state.isFrequencyValid = this.isAnswerValid();
-		// 	},
-		//
-
 		render: function render() {
 			// Re the "ref" thing below - this _seems_ to be a kind of reference
 			// between the virtual DOM (which is what "render") constructs and
 			// the actual DOM - see https://facebook.github.io/react/docs/more-about-refs.html
-
-			// <AmountSummary
-			// 	Amount={this.props.Answer.Amount}
-			// 	Frequency={this.props.Answer.Frequency}
-			// />
 
 			var ans = this.props.Answer;
 

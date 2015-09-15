@@ -13,6 +13,11 @@ var Utils = require("../common/utils");
 // Comment: ""
 
 var AnswerLine = React.createClass({
+	propTypes: {
+		Answer: React.PropTypes.object.isRequired,
+		onChange: React.PropTypes.func.isRequired		
+	},
+
 	getInitialState: function() {
 		return {
 			zoneErrors: [],
@@ -72,24 +77,11 @@ var AnswerLine = React.createClass({
 		this.state.isFrequencyValid = isDataItemValid;
 	},
 
-// 	onFrequencyChange: function(event) {
-// 		this.props.onChange(event);
-// debugger;
-// 		this.state.isFrequencyValid = this.isAnswerValid();
-// 	},
-//
-
-
 
 	render: function() {
 		// Re the "ref" thing below - this _seems_ to be a kind of reference
 		// between the virtual DOM (which is what "render") constructs and
 		// the actual DOM - see https://facebook.github.io/react/docs/more-about-refs.html
-
-		// <AmountSummary
-		// 	Amount={this.props.Answer.Amount}
-		// 	Frequency={this.props.Answer.Frequency}
-		// />
 
 		var ans = this.props.Answer;
 

@@ -9,6 +9,13 @@ var income = React.createClass({
 	mixins: [
 		Router.Navigation
 	],
+	statics: {
+		willTransitionFrom: function(transition, component) {
+			if (component.state.dirty && !confirm("Leave without saving?")) {
+				transition.abort();
+			}
+		}
+	},
 
 	getInitialState: function() {
 		// NOTE: arrays look a PITA in react, going to just use objects for now
@@ -16,7 +23,8 @@ var income = React.createClass({
 
 		return {
 			Budget: budget,
-			Errors: {}
+			Errors: {},
+			dirty: false
 		}
 	},
 
@@ -38,19 +46,9 @@ var income = React.createClass({
 		var dataItem = ele.dataset.key;
 
 		this.state.Budget.Income[dataItem][field] = value;
+		this.setState({dirty: true});
 
 		return this.setState( {key: this.state.Budget.Income[dataItem]} );
-
-
-
-		// var tar = event.target;
-		// var key = tar.parentElement.parentElement.dataset.key;
-		// var field = tar.name;
-		// var value = tar.value;
-		//
-		// this.state.Budget.Income[key][field] = value;
-		//
-		// return this.setState( {key: this.state.Budget.Income[key]} );
 	},
 
 	saveIncome: function(event) {
@@ -60,6 +58,8 @@ var income = React.createClass({
 		Db.saveBudget(this.state.Budget);
 
 		// this.transitionTo("home");
+		// no longer dirty!
+		this.setState({dirty: false});
 	},
 
 	render: function() {
