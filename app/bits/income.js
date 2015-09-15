@@ -38,7 +38,7 @@ var income = React.createClass({
 		// we're only going to localStorage, so just save the whole thing
 		Db.saveBudget(this.state);
 
-		this.transitionTo("home");
+		// this.transitionTo("home");
 	},
 
 	render: function() {
@@ -49,17 +49,12 @@ var income = React.createClass({
 		// Comment: ""
 		return (
 			<div>
-				<form className="form-inline">
+				<form>
 					<h2>Income</h2>
-					<ul className="list-group">
-						<li className="list-group-item">
-							<AnswerLine Answer={this.state.Income.CltWork} onChange={this.setAnswer} />
-						</li>
-						<li className="list-group-item">
-							<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} />
-						</li>
-					</ul>
-					<input type="submit" value="Save" className="btn btn-default" onClick={this.saveIncome} />
+					<AnswerLine Answer={this.state.Income.CltWork} onChange={this.setAnswer} />
+
+					<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} />
+					<button type="submit" className="mui-btn mui-btn-default mui-btn-raised" onClick={this.saveIncome}>Save</button>
 				</form>
 			</div>
 		)

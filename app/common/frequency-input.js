@@ -33,7 +33,7 @@ var Frequency = React.createClass({
   },
 
   render: function() {
-    var wrapperClass = "form-group";
+    var wrapperClass = "mui-form-group";
     if (this.props.error && this.props.error.length > 0) {
       wrapperClass += " " + "has-error";
     }
@@ -49,14 +49,15 @@ var Frequency = React.createClass({
     }, this);
 
     return (
-      <div className={wrapperClass}>
-        <div className="field">
-          <label htmlFor={this.props.name}>{this.props.label}</label>
-          <select defaultValue={this.props.defaultValue} ref="Frequency" name={this.props.name} className="form-control" onChange={this.props.onChange}>
-            {options}
-          </select>
-          <div className="input">{this.props.error}</div>
-        </div>
+      <div className={wrapperClass + " mui-form-group"}>
+        <label htmlFor={this.props.name}>{this.props.label}</label>
+
+        <select defaultValue={this.props.defaultValue} ref="Frequency"
+          name={this.props.name} className="mui-form-control" onChange={this.props.onChange}>
+          {options}
+        </select>
+
+        <div className="input">{this.props.error}</div>
       </div>
     );
   }

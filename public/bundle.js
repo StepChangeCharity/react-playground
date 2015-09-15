@@ -23719,7 +23719,7 @@
 			// we're only going to localStorage, so just save the whole thing
 			Db.saveBudget(this.state);
 
-			this.transitionTo("home");
+			// this.transitionTo("home");
 		},
 
 		render: function render() {
@@ -23733,27 +23733,19 @@
 				null,
 				React.createElement(
 					"form",
-					{ className: "form-inline" },
+					null,
 					React.createElement(
 						"h2",
 						null,
 						"Income"
 					),
+					React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer }),
+					React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer }),
 					React.createElement(
-						"ul",
-						{ className: "list-group" },
-						React.createElement(
-							"li",
-							{ className: "list-group-item" },
-							React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer })
-						),
-						React.createElement(
-							"li",
-							{ className: "list-group-item" },
-							React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer })
-						)
-					),
-					React.createElement("input", { type: "submit", value: "Save", className: "btn btn-default", onClick: this.saveIncome })
+						"button",
+						{ type: "submit", className: "mui-btn mui-btn-default mui-btn-raised", onClick: this.saveIncome },
+						"Save"
+					)
 				)
 			);
 		}
@@ -23786,25 +23778,27 @@
 			// between the virtual DOM (which is what "render") constructs and
 			// the actual DOM - see https://facebook.github.io/react/docs/more-about-refs.html
 
+			// <AmountSummary
+			// 	Amount={this.props.Answer.Amount}
+			// 	Frequency={this.props.Answer.Frequency}
+			// />
+
 			var groupName = this.props.Answer.Key;
 
 			return React.createElement(
 				"div",
-				{ className: groupName },
+				{ className: groupName + " mui-panel" },
 				React.createElement("input", { type: "hidden", name: "Key", value: groupName }),
-				React.createElement(Number, { name: "Amount", label: "Amount (£)",
+				React.createElement(Number, { name: "Amount", label: this.props.Answer.Prompt,
 					defaultValue: this.props.Answer.Amount,
 					value: this.props.Answer.Amount,
-					onChange: this.props.onChange
+					onChange: this.props.onChange,
+					currentFrequency: this.props.Answer.Frequency
 				}),
-				React.createElement(Frequency, { name: "Frequency", label: "Frequency",
+				React.createElement(Frequency, { name: "Frequency", label: "Which is paid ...",
 					defaultValue: this.props.Answer.Frequency,
 					value: this.props.Answer.Frequency,
 					onChange: this.props.onChange
-				}),
-				React.createElement(AmountSummary, {
-					Amount: this.props.Answer.Amount,
-					Frequency: this.props.Answer.Frequency
 				})
 			);
 		}
@@ -23837,36 +23831,49 @@
 	    };
 	  },
 
+	  getSummary: function getSummary(amount, frequency) {
+	    var multiplier = 1;
+	    var pcm = 0;
+
+	    if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
+
+	    pcm = (amount * multiplier).toFixed(2);
+
+	    return pcm;
+	  },
+
 	  render: function render() {
-	    var wrapperClass = "form-group";
+	    var wrapperClass = "";
 	    if (this.props.error && this.props.error.length > 0) {
 	      wrapperClass += " has-error";
 	    }
+	    var summary = "£" + this.getSummary(this.props.value, this.props.currentFrequency) + "pcm";
 
 	    return React.createElement(
 	      "div",
-	      { className: wrapperClass },
+	      { className: wrapperClass + " mui-form-group" },
+	      React.createElement(
+	        "label",
+	        { htmlFor: this.props.name },
+	        this.props.label,
+	        React.createElement(
+	          "span",
+	          { className: "mui-pull-right" },
+	          summary
+	        )
+	      ),
+	      React.createElement("input", { type: "number",
+	        name: this.props.name,
+	        className: "mui-form-control",
+	        placeholder: this.props.placeholder,
+	        ref: this.props.name,
+	        value: this.props.value,
+	        onChange: this.props.onChange
+	      }),
 	      React.createElement(
 	        "div",
-	        { className: "field" },
-	        React.createElement(
-	          "label",
-	          { htmlFor: this.props.name },
-	          this.props.label
-	        ),
-	        React.createElement("input", { type: "number",
-	          name: this.props.name,
-	          className: "form-control",
-	          placeholder: this.props.placeholder,
-	          ref: this.props.name,
-	          value: this.props.value,
-	          onChange: this.props.onChange
-	        }),
-	        React.createElement(
-	          "div",
-	          { className: "input" },
-	          this.props.error
-	        )
+	        { className: "input" },
+	        this.props.error
 	      )
 	    );
 	  }
@@ -23925,7 +23932,7 @@
 	  },
 
 	  render: function render() {
-	    var wrapperClass = "form-group";
+	    var wrapperClass = "mui-form-group";
 	    if (this.props.error && this.props.error.length > 0) {
 	      wrapperClass += " " + "has-error";
 	    }
@@ -23942,25 +23949,22 @@
 
 	    return React.createElement(
 	      "div",
-	      { className: wrapperClass },
+	      { className: wrapperClass + " mui-form-group" },
+	      React.createElement(
+	        "label",
+	        { htmlFor: this.props.name },
+	        this.props.label
+	      ),
+	      React.createElement(
+	        "select",
+	        { defaultValue: this.props.defaultValue, ref: "Frequency",
+	          name: this.props.name, className: "mui-form-control", onChange: this.props.onChange },
+	        options
+	      ),
 	      React.createElement(
 	        "div",
-	        { className: "field" },
-	        React.createElement(
-	          "label",
-	          { htmlFor: this.props.name },
-	          this.props.label
-	        ),
-	        React.createElement(
-	          "select",
-	          { defaultValue: this.props.defaultValue, ref: "Frequency", name: this.props.name, className: "form-control", onChange: this.props.onChange },
-	          options
-	        ),
-	        React.createElement(
-	          "div",
-	          { className: "input" },
-	          this.props.error
-	        )
+	        { className: "input" },
+	        this.props.error
 	      )
 	    );
 	  }

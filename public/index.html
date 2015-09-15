@@ -1,17 +1,35 @@
-<!DOCTYPE>
+﻿<!DOCTYPE>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<!--<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="//cdn.muicss.com/mui-0.1.22-rc1/css/mui.min.css" rel="stylesheet" type="text/css" />
+	<link href="custom.css" rel="stylesheet" type="text/css" />
+	<script src="//cdn.muicss.com/mui-0.1.22-rc1/js/mui.min.js"></script>
+
 	<style>
 		#menu, #content { border: solid 1px silver; }
 		#content { height: 100%; }
+		.fl { float: left; }
+		.fr { float: right; }
+		.clr, .clear { clear: both; }
+		.ib { display: inline-block; }
 	</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
-	<div class="row">
-		<div id="menu" class="col-md-2">
-			<ol>
+
+	<div id="sidedrawer">
+		<nav id="sidenav">
+			<div>
+				<h2 class="mui-navbar-line-height"><a href="/">DR</a></h2>
+			</div>
+			<div class="mui-divider"></div>
+			<ul>
 				<li><a href="#/">Home</a></li>
 				<li><a href="#/debts">Debts</a></li>
 				<li><a href="#/assets">Assets</a></li>
@@ -19,16 +37,27 @@
 				<li><a href="#/expenditure">Expenditure</a></li>
 				<li><a href="#/advice">Advice</a></li>
 				<li><a href="#/home">You</a></li>
-			</ol>
+			</ul>
+
+		</nav>
+	</div>
+
+	<div id="content-wrapper">
+		<div id="appbar-placeholder" class="mui-appbar">
+			<p class="mui-text-display1 mui-text-white" style="vertical-align: middle">Debt Remedy</p>
 		</div>
 
-		<div id="content" class="col-md-10">
-			<div id="app"></div>
+		<div class="mui-container-fluid">
+			<div class="mui-row">
+				<div class="mui-col-sm-10 mui-col-sm-offset-1">
+					<div id="app"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="./shims.js"></script>
-	<script src="./bundle.js"></script>	
+	<script src="./bundle.js"></script>
 </body>
 </html>
