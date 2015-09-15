@@ -39,8 +39,7 @@ var Frequency = React.createClass({
     return <option key={id} value={desc}>{desc}</option>;
   },
 
-  render: function() {
-    var supports = this.props.supports;
+  getOptions: function(supports) {
     if (supports === undefined || supports.length == 0) {
       // nothing specified, so ensure all are supplied
       supports = "W/F/4/M/Y";
@@ -50,9 +49,15 @@ var Frequency = React.createClass({
       return this.getOption(opt, i);
     }, this);
 
+    return options;
+  },
+
+  render: function() {
     var hideError = "";
     if (this.props.isValid)
       hideError = "mui-hide";
+
+    var freqOptions = this.getOptions(this.props.supports);
 
     return (
       <div className="mui-form-group">
@@ -61,7 +66,7 @@ var Frequency = React.createClass({
         <span>
           <select defaultValue={this.props.defaultValue} ref="Frequency"
             name={this.props.name} className="pull-left mui-form-control half ib" onChange={this.props.onChange}>
-            {options}
+            {freqOptions}
           </select>
 
           <span className={hideError + " pull-right error-indicator"}>*</span>
