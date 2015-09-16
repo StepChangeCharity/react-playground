@@ -19,8 +19,8 @@ var income = React.createClass({
 	},
 
 	getInitialState: function() {
-		// NOTE: arrays look a PITA in react, going to just use objects for now
-		debugger;
+		// NOTE: Probably better as an array rather than objects, but don't
+		// want to dwell on it too much at the moment!
 		var income = Db.getIncome();
 		var IS_BLANK = undefined;
 
@@ -102,6 +102,8 @@ var income = React.createClass({
 
 					{/* Note the lack of a monthly option*/}
 					<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} supports="W/F/4/Y" />
+
+					<AnswerLine Answer={this.state.Income.ChildSupport} onChange={this.setAnswer} />
 
 					<button type="submit" className="mui-btn" data-mui-color="accent" onClick={this.saveIncome}>Save</button>
 					<span className="mui-pull-right">

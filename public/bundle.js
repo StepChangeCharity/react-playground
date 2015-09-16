@@ -23752,8 +23752,8 @@
 		},
 
 		getInitialState: function getInitialState() {
-			// NOTE: arrays look a PITA in react, going to just use objects for now
-			debugger;
+			// NOTE: Probably better as an array rather than objects, but don't
+			// want to dwell on it too much at the moment!
 			var income = Db.getIncome();
 			var IS_BLANK = undefined;
 
@@ -23844,6 +23844,7 @@
 					),
 					React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer }),
 					React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer, supports: "W/F/4/Y" }),
+					React.createElement(AnswerLine, { Answer: this.state.Income.ChildSupport, onChange: this.setAnswer }),
 					React.createElement(
 						"button",
 						{ type: "submit", className: "mui-btn", "data-mui-color": "accent", onClick: this.saveIncome },
