@@ -15,7 +15,7 @@ var Utils = require("../common/utils");
 var AnswerLine = React.createClass({
 	propTypes: {
 		Answer: React.PropTypes.object.isRequired,
-		onChange: React.PropTypes.func.isRequired		
+		onChange: React.PropTypes.func.isRequired
 	},
 
 	getInitialState: function() {
@@ -43,6 +43,8 @@ var AnswerLine = React.createClass({
 			this.state.zoneErrors.push(msg);
 			valid = false;
 		}
+
+		this.state.isAmountValid = this.state.isFrequencyValid = valid;
 
 		return valid;
 	},

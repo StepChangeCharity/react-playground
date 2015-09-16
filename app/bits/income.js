@@ -2,6 +2,7 @@
 
 var React = require("react");
 var Router = require("react-router");
+var Link = Router.Link;
 var AnswerLine = require("./answer-line");
 var Db = require("../common/DB");
 
@@ -63,19 +64,25 @@ var income = React.createClass({
 	},
 
 	render: function() {
-		// Prompt: "",
-		// DataItem: "",
-		// Amount: 0,
-		// Frequency: "",
-		// Comment: ""
+		var formIsDirty;
+
+		if (this.state.dirty) {
+			formIsDirty = <span className='mui-pull-right form-dirty'>*</span>;
+		}
+
 		return (
 			<div>
 				<form>
-					<h2>Income</h2>
-					<AnswerLine Answer={this.state.Budget.Income.CltWork} onChange={this.setAnswer} />
+					<h2>Income {formIsDirty} </h2>
 
+					<AnswerLine Answer={this.state.Budget.Income.CltWork} onChange={this.setAnswer} />
 					<AnswerLine Answer={this.state.Budget.Income.PtrWork} onChange={this.setAnswer} />
-					<button type="submit" className="mui-btn mui-btn-default mui-btn-raised" onClick={this.saveIncome}>Save</button>
+
+					<button type="submit" className="mui-btn" data-mui-color="accent" onClick={this.saveIncome}>Save</button>
+					<span className="mui-pull-right">
+						<Link to="expenditure" className="mui-btn" data-mui-color="primary">&laquo; Back</Link>
+						<Link to="assets" className="mui-btn" data-mui-color="primary">Next &raquo;</Link>
+					</span>
 				</form>
 			</div>
 		)

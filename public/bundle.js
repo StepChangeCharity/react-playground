@@ -23561,8 +23561,10 @@
 		Route,
 		null,
 		React.createElement(DefaultRoute, { handler: home }),
+		React.createElement(Route, { name: "home", handler: home }),
+		React.createElement(Route, { name: "assets" }),
 		React.createElement(Route, { name: "income", handler: income }),
-		React.createElement(Route, { name: "home", handler: home })
+		React.createElement(Route, { name: "expenditure" })
 	);
 
 	module.exports = routes;
@@ -23683,6 +23685,7 @@
 
 	var React = __webpack_require__(1);
 	var Router = __webpack_require__(157);
+	var Link = Router.Link;
 	var AnswerLine = __webpack_require__(200);
 	var Db = __webpack_require__(198);
 
@@ -23744,11 +23747,16 @@
 		},
 
 		render: function render() {
-			// Prompt: "",
-			// DataItem: "",
-			// Amount: 0,
-			// Frequency: "",
-			// Comment: ""
+			var formIsDirty;
+
+			if (this.state.dirty) {
+				formIsDirty = React.createElement(
+					"span",
+					{ className: "mui-pull-right form-dirty" },
+					"*"
+				);
+			}
+
 			return React.createElement(
 				"div",
 				null,
@@ -23758,14 +23766,30 @@
 					React.createElement(
 						"h2",
 						null,
-						"Income"
+						"Income ",
+						formIsDirty,
+						" "
 					),
 					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.CltWork, onChange: this.setAnswer }),
 					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.PtrWork, onChange: this.setAnswer }),
 					React.createElement(
 						"button",
-						{ type: "submit", className: "mui-btn mui-btn-default mui-btn-raised", onClick: this.saveIncome },
+						{ type: "submit", className: "mui-btn", "data-mui-color": "accent", onClick: this.saveIncome },
 						"Save"
+					),
+					React.createElement(
+						"span",
+						{ className: "mui-pull-right" },
+						React.createElement(
+							Link,
+							{ to: "expenditure", className: "mui-btn", "data-mui-color": "primary" },
+							"« Back"
+						),
+						React.createElement(
+							Link,
+							{ to: "assets", className: "mui-btn", "data-mui-color": "primary" },
+							"Next »"
+						)
 					)
 				)
 			);
@@ -23825,6 +23849,8 @@
 				this.state.zoneErrors.push(msg);
 				valid = false;
 			}
+
+			this.state.isAmountValid = this.state.isFrequencyValid = valid;
 
 			return valid;
 		},
