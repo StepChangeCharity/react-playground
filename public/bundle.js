@@ -23881,7 +23881,6 @@
 	var React = __webpack_require__(1);
 	var Number = __webpack_require__(201);
 	var Frequency = __webpack_require__(204);
-	var AmountSummary = __webpack_require__(202);
 	var Utils = __webpack_require__(203);
 
 	// Prompt: "How much do you earn?",
@@ -24011,10 +24010,6 @@
 	  },
 
 	  render: function render() {
-	    var summary = React.createElement(AccountSummary, {
-	      Amount: this.props.value,
-	      Frequency: this.props.currentFrequency
-	    });
 	    var hideError = "";
 	    if (this.props.isValid) hideError = "mui-hide";
 
@@ -24028,7 +24023,10 @@
 	        React.createElement(
 	          "span",
 	          { className: "mui-pull-right" },
-	          summary
+	          React.createElement(AccountSummary, {
+	            Amount: this.props.value,
+	            Frequency: this.props.currentFrequency
+	          })
 	        )
 	      ),
 	      React.createElement(

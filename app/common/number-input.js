@@ -19,10 +19,6 @@ var Number = React.createClass({
   },
 
   render: function() {
-    var summary = <AccountSummary
-      Amount={this.props.value}
-      Frequency={this.props.currentFrequency}
-    />;
     var hideError = "";
     if (this.props.isValid)
       hideError = "mui-hide";
@@ -32,7 +28,12 @@ var Number = React.createClass({
 
         <label htmlFor={this.props.name}>
           {this.props.label}
-          <span className="mui-pull-right">{summary}</span>
+          <span className="mui-pull-right">
+            <AccountSummary
+              Amount={this.props.value}
+              Frequency={this.props.currentFrequency}
+            />
+          </span>
         </label>
 
         <span>

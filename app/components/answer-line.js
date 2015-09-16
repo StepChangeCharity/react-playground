@@ -3,7 +3,6 @@
 var React = require("react");
 var Number = require("../common/number-input");
 var Frequency = require("../common/frequency-input");
-var AmountSummary = require("../common/amount-summary");
 var Utils = require("../common/utils");
 
 // Prompt: "How much do you earn?",
