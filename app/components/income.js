@@ -37,11 +37,14 @@ var income = React.createClass({
 	},
 
 	addIncomeItem: function(income, dataItem, type, startAmount, startFreq, prompt) {
-		if (income.dataItem)
-			return;
+		var current = income[dataItem];
+		if (current) {
+				// DataItem already present
+				return;
+		}
 
 		var newItem = {
-			Key: dataItem,
+			DataItem: dataItem,
 			TypeRequired: type,
 			Amount: startAmount,
 			Frequency: startFreq,

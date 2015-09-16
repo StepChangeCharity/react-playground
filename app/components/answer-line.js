@@ -83,7 +83,7 @@ var AnswerLine = React.createClass({
 
 		return (
 
-			<div className="mui-panel" data-key={ans.Key}>
+			<div className="mui-panel" data-key={ans.DataItem}>
 				<div dangerouslySetInnerHTML={this.getZoneErrors()} />
 
 				<Number name="Amount" label={ans.Prompt}

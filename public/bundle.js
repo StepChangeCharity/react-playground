@@ -23770,10 +23770,14 @@
 		},
 
 		addIncomeItem: function addIncomeItem(income, dataItem, type, startAmount, startFreq, prompt) {
-			if (income.dataItem) return;
+			var current = income[dataItem];
+			if (current) {
+				// DataItem already present
+				return;
+			}
 
 			var newItem = {
-				Key: dataItem,
+				DataItem: dataItem,
 				TypeRequired: type,
 				Amount: startAmount,
 				Frequency: startFreq,
@@ -23961,7 +23965,7 @@
 
 			return React.createElement(
 				"div",
-				{ className: "mui-panel", "data-key": ans.Key },
+				{ className: "mui-panel", "data-key": ans.DataItem },
 				React.createElement("div", { dangerouslySetInnerHTML: this.getZoneErrors() }),
 				React.createElement(Number, { name: "Amount", label: ans.Prompt,
 					defaultValue: ans.Amount,
