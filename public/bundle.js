@@ -23771,7 +23771,7 @@
 						" "
 					),
 					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.CltWork, onChange: this.setAnswer }),
-					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.PtrWork, onChange: this.setAnswer }),
+					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.PtrWork, onChange: this.setAnswer, supports: "W/F/4/Y" }),
 					React.createElement(
 						"button",
 						{ type: "submit", className: "mui-btn", "data-mui-color": "accent", onClick: this.saveIncome },
@@ -23797,6 +23797,7 @@
 	});
 
 	module.exports = income;
+	/* Note the lack of a monthly option*/
 
 /***/ },
 /* 200 */
@@ -23806,9 +23807,9 @@
 
 	var React = __webpack_require__(1);
 	var Number = __webpack_require__(201);
-	var Frequency = __webpack_require__(202);
-	var AmountSummary = __webpack_require__(203);
-	var Utils = __webpack_require__(204);
+	var Frequency = __webpack_require__(204);
+	var AmountSummary = __webpack_require__(202);
+	var Utils = __webpack_require__(203);
 
 	// Prompt: "How much do you earn?",
 	// DataItem: "Clt.Work",
@@ -23832,11 +23833,6 @@
 			};
 		},
 
-		// onError: function(errors) {
-		// 	this.state.zoneErrors = [];
-		// 	this.state.zoneErrors.push(errors);
-		// },
-
 		isAnswerValid: function isAnswerValid() {
 			var valid = true;
 			// reset error cache
@@ -23845,7 +23841,7 @@
 			var pcm = Utils.getSummary(this.props.Answer.Amount, this.props.Answer.Frequency);
 			if (pcm > 500) {
 				// es6 string template stuff no worky in react (extension can be installed)
-				var msg = "£" + pcm + " per calendar month is too many pounds.";
+				var msg = "£" + Utils.commafy(pcm) + " per calendar month is too many pounds.";
 				this.state.zoneErrors.push(msg);
 				valid = false;
 			}
@@ -23906,7 +23902,8 @@
 					defaultValue: ans.Frequency,
 					value: ans.Frequency,
 					onChange: this.onDataItemChange,
-					isValid: this.state.isFrequencyValid
+					isValid: this.state.isFrequencyValid,
+					supports: this.props.supports
 				})
 			);
 		}
@@ -23921,7 +23918,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
-	var AccountSummary = __webpack_require__(203);
+	var AccountSummary = __webpack_require__(202);
 
 	var Number = React.createClass({
 	  displayName: "Number",
@@ -23987,6 +23984,72 @@
 
 /***/ },
 /* 202 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+	var Utils = __webpack_require__(203);
+
+	var AmountSummary = React.createClass({
+		displayName: "AmountSummary",
+
+		getInitialState: function getInitialState() {
+			return {
+				Amount: 0,
+				Frequency: "Monthly"
+			};
+		},
+
+		render: function render() {
+			var summary = Utils.getSummary(this.props.Amount, this.props.Frequency);
+
+			summary = Utils.commafy(summary);
+
+			return React.createElement(
+				"span",
+				{ className: "monthly-amount" },
+				"£",
+				summary,
+				" pcm"
+			);
+		}
+
+	});
+
+	module.exports = AmountSummary;
+
+/***/ },
+/* 203 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var Utils = {
+
+			getSummary: function getSummary(amount, frequency) {
+					var multiplier = 1;
+					var pcm = 0;
+
+					if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
+
+					pcm = (amount * multiplier).toFixed(2);
+
+					return pcm;
+			},
+
+			commafy: function commafy(x) {
+					var parts = x.toString().split(".");
+					parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+					return parts.join(".");
+			}
+
+	};
+
+	module.exports = Utils;
+
+/***/ },
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24088,65 +24151,6 @@
 	});
 
 	module.exports = Frequency;
-
-/***/ },
-/* 203 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(1);
-	var Utils = __webpack_require__(204);
-
-	var AmountSummary = React.createClass({
-		displayName: "AmountSummary",
-
-		getInitialState: function getInitialState() {
-			return {
-				Amount: 0,
-				Frequency: "Monthly"
-			};
-		},
-
-		render: function render() {
-
-			var summary = Utils.getSummary(this.props.Amount, this.props.Frequency);
-
-			return React.createElement(
-				"span",
-				{ className: "monthly-amount" },
-				"£",
-				summary,
-				" pcm"
-			);
-		}
-
-	});
-
-	module.exports = AmountSummary;
-
-/***/ },
-/* 204 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	var Utils = {
-
-			getSummary: function getSummary(amount, frequency) {
-					var multiplier = 1;
-					var pcm = 0;
-
-					if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
-
-					pcm = (amount * multiplier).toFixed(2);
-
-					return pcm;
-			}
-
-	};
-
-	module.exports = Utils;
 
 /***/ }
 /******/ ]);

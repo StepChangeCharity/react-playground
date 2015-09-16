@@ -1,8 +1,8 @@
 "use strict";
 
 var React = require("react");
-var home = require("./bits/home");
-var income = require("./bits/income");
+var home = require("./components/home");
+var income = require("./components/income");
 var Router = require("react-router");
 var DefaultRoute = Router.DefaultRoute;
 var Route = Router.Route;

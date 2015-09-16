@@ -76,7 +76,9 @@ var income = React.createClass({
 					<h2>Income {formIsDirty} </h2>
 
 					<AnswerLine Answer={this.state.Budget.Income.CltWork} onChange={this.setAnswer} />
-					<AnswerLine Answer={this.state.Budget.Income.PtrWork} onChange={this.setAnswer} />
+
+					{/* Note the lack of a monthly option*/}
+					<AnswerLine Answer={this.state.Budget.Income.PtrWork} onChange={this.setAnswer} supports="W/F/4/Y" />
 
 					<button type="submit" className="mui-btn" data-mui-color="accent" onClick={this.saveIncome}>Save</button>
 					<span className="mui-pull-right">
