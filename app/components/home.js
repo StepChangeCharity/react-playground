@@ -5,8 +5,9 @@ var Db = require("../common/DB");
 
 var home = React.createClass({
 	getInitialState: function() {
-		var budget = Db.getBudget();
-		return budget;
+		return {
+			WebNumber: Db.getClientNumber()			
+		}
 	},
 	componentDidMount: function() {
 		// used to iniitalise the view, e.g. load some data from a web api end-point

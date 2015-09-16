@@ -49,6 +49,9 @@
 	var React = __webpack_require__(1);
 	var Router = __webpack_require__(157);
 	var routes = __webpack_require__(196);
+	var db = __webpack_require__(198);
+
+	db.initDB();
 
 	Router.run(routes, function (Root) {
 		React.render(React.createElement(Root, null), document.getElementById("app"));
@@ -23582,8 +23585,9 @@
 		displayName: "home",
 
 		getInitialState: function getInitialState() {
-			var budget = Db.getBudget();
-			return budget;
+			return {
+				WebNumber: Db.getClientNumber()
+			};
 		},
 		componentDidMount: function componentDidMount() {
 			// used to iniitalise the view, e.g. load some data from a web api end-point
@@ -23633,49 +23637,95 @@
 
 	var DB = {
 
-		saveBudget: function saveBudget(data) {
-			var json = JSON.stringify(data);
-			window.localStorage.setItem("budget", json);
-			console.log("Budget saved.");
-			return data;
+		getClientNumber: function getClientNumber() {
+			var wn = null;
+
+			this.ensureHasAccount();
+			wn = localStorage["WEB_NUMBER"];
+
+			return wn;
 		},
 
-		initBudget: function initBudget() {
-			var db = null;
+		getIncome: function getIncome() {
+			var data = null,
+			    income = null;
 
-			$.ajax({
-				// Hey, we're just prototyping ... stop judging me !
-				async: false,
-				url: "./data.js",
-				dataType: "json",
-				cache: false,
-				success: function success(data) {
-					db = DB.saveBudget(data);
-					console.log("Budget initialised.");
-				},
-				error: function error(xhr, status, err) {
-					console.log("error!", err);
-				}
-			});
+			this.ensureHasAccount();
+			data = localStorage["INCOME"];
+			income = JSON.parse(data);
 
-			return db;
+			console.log("INCOME loaded");
+
+			return income;
 		},
 
-		getBudget: function getBudget() {
-			var db = window.localStorage["budget"];
-			if (db === undefined) {
-				db = this.initBudget();
-			} else {
-				var json = window.localStorage["budget"];
-				db = JSON.parse(json);
-				console.log("Budget loaded.");
+		saveIncome: function saveIncome(income) {
+			localStorage["INCOME"] = JSON.stringify(income);
+			console.log("INCOME saved");
+			return income;
+		},
+
+		ensureHasAccount: function ensureHasAccount() {
+			var data = localStorage["WEB_NUMBER"];
+			if (data !== undefined) {
+				// account already exists
+				return true;
 			}
+
+			// No account, so initial setup
+			this.createClient();
+
+			// Flag account was created
+			return true;
+		},
+
+		createClient: function createClient() {
+			var db = null;
+			var webNumber = "";
+			var nextId = localStorage["MAX_ID"];
+			nextId++;
+
+			webNumber = "W" + nextId.toString();
+
+			localStorage["WEB_NUMBER"] = webNumber;
+
+			// add empty placeholders
+			localStorage["INCOME"] = "{}";
+			localStorage["EXPENDITURE"] = "{}";
+			localStorage["DEBTS"] = "{}";
+			localStorage["ASSETS"] = "{}";
+			localStorage["YOU"] = "{}";
+
 			return db;
+		},
+
+		initDB: function initDB() {
+			var incrementer = localStorage["MAX_ID"];
+			if (incrementer === undefined) {
+				incrementer = 999;
+				localStorage["MAX_ID"] = incrementer;
+			}
 		}
 
 	};
 
 	module.exports = DB;
+
+	// ASYNC JSON load snippet
+	// $.ajax({
+	// 	// Hey, we're just prototyping ... stop judging me !
+	// 	async: false,
+	// 	url: "./data.js",
+	// 	dataType: "json",
+	// 	cache: false,
+	// 	success: function(data) {
+	// 		db = DB.saveBudget(data);
+	// 		console.log("Budget initialised.");
+	// 	},
+	// 	error: function(xhr, status, err) {
+	// 		console.log("error!", err);
+	// 	}
+	// });
 
 /***/ },
 /* 199 */
@@ -23703,17 +23753,39 @@
 
 		getInitialState: function getInitialState() {
 			// NOTE: arrays look a PITA in react, going to just use objects for now
-			var budget = Db.getBudget();
+			debugger;
+			var income = Db.getIncome();
+			var IS_BLANK = undefined;
+
+			// init dataitems (yes, there WILL be a better way to do this!)
+			this.addIncomeItem(income, "CltWork", "CURRENCY", IS_BLANK, "Monthly", "How much do you earn?");
+			this.addIncomeItem(income, "PtrWork", "CURRENCY", 0, "4-Weekly", "How much does your partner earn?");
+			this.addIncomeItem(income, "ChildSupport", "CURRENCY", IS_BLANK, "Monthly", "How much child support do you receive?");
 
 			return {
-				Budget: budget,
+				Income: income,
 				Errors: {},
 				dirty: false
 			};
 		},
 
+		addIncomeItem: function addIncomeItem(income, dataItem, type, startAmount, startFreq, prompt) {
+			if (income.dataItem) return;
+
+			var newItem = {
+				Key: dataItem,
+				TypeRequired: type,
+				Amount: startAmount,
+				Frequency: startFreq,
+				Prompt: prompt,
+				Comment: ""
+			};
+
+			income[dataItem] = newItem;
+		},
+
 		componentDidMount: function componentDidMount() {
-			//var Db = Db.getBudget();
+			//var income = Db.getIncome();
 			//this.setState({ webNumber: this.state.WebNumber });
 		},
 
@@ -23729,17 +23801,17 @@
 
 			var dataItem = ele.dataset.key;
 
-			this.state.Budget.Income[dataItem][field] = value;
+			this.state.Income[dataItem][field] = value;
 			this.setState({ dirty: true });
 
-			return this.setState({ key: this.state.Budget.Income[dataItem] });
+			return this.setState({ key: this.state.Income[dataItem] });
 		},
 
 		saveIncome: function saveIncome(event) {
 			event.preventDefault();
 
 			// we're only going to localStorage, so just save the whole thing
-			Db.saveBudget(this.state.Budget);
+			Db.saveIncome(this.state.Income);
 
 			// this.transitionTo("home");
 			// no longer dirty!
@@ -23770,8 +23842,8 @@
 						formIsDirty,
 						" "
 					),
-					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.CltWork, onChange: this.setAnswer }),
-					React.createElement(AnswerLine, { Answer: this.state.Budget.Income.PtrWork, onChange: this.setAnswer, supports: "W/F/4/Y" }),
+					React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer }),
+					React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer, supports: "W/F/4/Y" }),
 					React.createElement(
 						"button",
 						{ type: "submit", className: "mui-btn", "data-mui-color": "accent", onClick: this.saveIncome },
@@ -24003,7 +24075,6 @@
 
 		render: function render() {
 			var summary = Utils.getSummary(this.props.Amount, this.props.Frequency);
-
 			summary = Utils.commafy(summary);
 
 			return React.createElement(
@@ -24027,22 +24098,28 @@
 
 	var Utils = {
 
-			getSummary: function getSummary(amount, frequency) {
-					var multiplier = 1;
-					var pcm = 0;
+	  getSummary: function getSummary(amount, frequency) {
+	    var multiplier = 1;
+	    var pcm = 0;
 
-					if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
+	    if (frequency === "Yearly") multiplier = 0.083333;else if (frequency === "Quarterly") multiplier = 0.333333;else if (frequency === "Monthly") multiplier = 1;else if (frequency === "4-Weekly") multiplier = 1.083333;else if (frequency === "Weekly") multiplier = 4.33333;else if (frequency === "Fortnightly") multiplier = 2.166666;
 
-					pcm = (amount * multiplier).toFixed(2);
+	    pcm = amount * multiplier;
 
-					return pcm;
-			},
+	    if (isNaN(pcm)) {
+	      pcm = 0;
+	    }
 
-			commafy: function commafy(x) {
-					var parts = x.toString().split(".");
-					parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-					return parts.join(".");
-			}
+	    pcm = pcm.toFixed(2);
+
+	    return pcm;
+	  },
+
+	  commafy: function commafy(x) {
+	    var parts = x.toString().split(".");
+	    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	    return parts.join(".");
+	  }
 
 	};
 

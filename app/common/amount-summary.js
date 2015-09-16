@@ -13,7 +13,6 @@ var AmountSummary = React.createClass({
 
 	render: function() {
 		var summary = Utils.getSummary(this.props.Amount, this.props.Frequency);
-
 		summary = Utils.commafy(summary);
 
 		return (

@@ -13,7 +13,13 @@ var Utils = {
 		else if (frequency === "Weekly") multiplier = 4.33333;
 		else if (frequency === "Fortnightly") multiplier = 2.166666;
 
-    pcm = (amount * multiplier).toFixed(2);
+    pcm = (amount * multiplier);
+
+    if (isNaN(pcm)) {
+      pcm = 0;
+    }
+
+    pcm = pcm.toFixed(2);
 
 		return pcm;
 	},

@@ -20,17 +20,40 @@ var income = React.createClass({
 
 	getInitialState: function() {
 		// NOTE: arrays look a PITA in react, going to just use objects for now
-		var budget = Db.getBudget();
+		debugger;
+		var income = Db.getIncome();
+		var IS_BLANK = undefined;
+
+		// init dataitems (yes, there WILL be a better way to do this!)
+		this.addIncomeItem(income, "CltWork", "CURRENCY", IS_BLANK, "Monthly", "How much do you earn?");
+		this.addIncomeItem(income, "PtrWork", "CURRENCY", 0, "4-Weekly", "How much does your partner earn?");
+		this.addIncomeItem(income, "ChildSupport", "CURRENCY", IS_BLANK, "Monthly", "How much child support do you receive?")
 
 		return {
-			Budget: budget,
+			Income: income,
 			Errors: {},
 			dirty: false
 		}
 	},
 
+	addIncomeItem: function(income, dataItem, type, startAmount, startFreq, prompt) {
+		if (income.dataItem)
+			return;
+
+		var newItem = {
+			Key: dataItem,
+			TypeRequired: type,
+			Amount: startAmount,
+			Frequency: startFreq,
+			Prompt: prompt,
+			Comment: ""
+		};
+
+		income[dataItem] = newItem;
+	},
+
 	componentDidMount: function() {
-		//var Db = Db.getBudget();
+		//var income = Db.getIncome();
 		//this.setState({ webNumber: this.state.WebNumber });
 	},
 
@@ -46,17 +69,17 @@ var income = React.createClass({
 
 		var dataItem = ele.dataset.key;
 
-		this.state.Budget.Income[dataItem][field] = value;
+		this.state.Income[dataItem][field] = value;
 		this.setState({dirty: true});
 
-		return this.setState( {key: this.state.Budget.Income[dataItem]} );
+		return this.setState( {key: this.state.Income[dataItem]} );
 	},
 
 	saveIncome: function(event) {
 		event.preventDefault();
 
 		// we're only going to localStorage, so just save the whole thing
-		Db.saveBudget(this.state.Budget);
+		Db.saveIncome(this.state.Income);
 
 		// this.transitionTo("home");
 		// no longer dirty!
@@ -75,10 +98,10 @@ var income = React.createClass({
 				<form>
 					<h2>Income {formIsDirty} </h2>
 
-					<AnswerLine Answer={this.state.Budget.Income.CltWork} onChange={this.setAnswer} />
+					<AnswerLine Answer={this.state.Income.CltWork} onChange={this.setAnswer} />
 
 					{/* Note the lack of a monthly option*/}
-					<AnswerLine Answer={this.state.Budget.Income.PtrWork} onChange={this.setAnswer} supports="W/F/4/Y" />
+					<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} supports="W/F/4/Y" />
 
 					<button type="submit" className="mui-btn" data-mui-color="accent" onClick={this.saveIncome}>Save</button>
 					<span className="mui-pull-right">
