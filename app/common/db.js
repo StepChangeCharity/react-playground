@@ -12,20 +12,19 @@ var DB = {
 	},
 
 	getIncome: function() {
+		console.log("DB::getIncome");
 		var data = null, income = null;
 
 		this.ensureHasAccount();
 		data = localStorage["INCOME"];
 		income = JSON.parse(data);
 
-		console.log("INCOME loaded");
-
 		return income;
 	},
 
 	saveIncome: function(income) {
+		console.log("DB::saveIncome");
 		localStorage["INCOME"] = JSON.stringify(income);
-		console.log("INCOME saved");
 		return income;
 	},
 
@@ -44,6 +43,7 @@ var DB = {
 	},
 
 	createClient: function() {
+		console.log("DB::createClient");
 		// start afresh
 		localStorage.clear();
 
@@ -69,6 +69,7 @@ var DB = {
 	},
 
 	initDB: function(withIncrementor) {
+		console.log("DB::initDB");
 		var incrementer = localStorage["MAX_ID"];
 		if (incrementer !== undefined) {
 			// already done, so skip this step

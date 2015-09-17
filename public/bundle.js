@@ -23654,10 +23654,10 @@
 	var ClientActions = {
 
 	  getClient: function getClient(client) {
-	    console.log("ClientActions.getClient");
 	    var newClient = Db.getClient();
 
 	    // Go tell all the stores that a Client was created
+	    console.log("clientActions::getClient -> dispatch(GET_CLIENT)");
 	    Dispatcher.dispatch({
 	      actionType: ActionTypes.GET_CLIENT,
 	      client: newClient
@@ -23988,7 +23988,9 @@
 	// Lists all action supported by the dispatcher - nice way to see what the application does!
 	module.exports = keyMirror({
 	  INITIALISE: null,
-	  GET_CLIENT: null
+	  GET_CLIENT: null,
+	  GET_INCOME: null,
+	  SAVE_INCOME: null
 	});
 
 /***/ },
@@ -24011,26 +24013,22 @@
 	var ClientStore = Assign({}, EventEmitter.prototype, {
 
 	  addChangeListener: function addChangeListener(callback) {
-	    console.log("addChangeListener");
+	    console.log("ClientStore::addChangeListener -> this.on(CHANGE_EVENT, ...)");
 	    this.on(CHANGE_EVENT, callback);
 	  },
 
 	  removeChangeListener: function removeChangeListener(callback) {
-	    console.log("removeChangeListener");
+	    console.log("ClientStore::removeChangeListener -> this.removeListener(CHANGE_EVENT, ...)");
 	    this.removeListener(CHANGE_EVENT, callback);
 	  },
 
 	  emitChange: function emitChange() {
-	    console.log("emitChange");
+	    console.log("ClientStore::emitChange -> this.emit(CHANGE_EVENT)");
 	    this.emit(CHANGE_EVENT);
 	  },
 
 	  getClient: function getClient() {
 	    return _client;
-	  },
-
-	  getIncome: function getIncome() {
-	    return _income;
 	  }
 
 	});
@@ -24041,7 +24039,7 @@
 	      _client = action.initialData.client;
 	      _income = action.initialData.income;
 
-	      console.log("ClientStore.emitChange(INITIALISE)");
+	      console.log("ClientStore.emitChange(INITIALISE)", "clientStore.js");
 	      ClientStore.emitChange();
 	      break;
 
@@ -24051,7 +24049,7 @@
 	      // Tell the rest of the UI that a Client has been created
 	      ClientStore.emitChange();
 
-	      console.log("ClientStore.emitChange(GET_CLIENT)");
+	      console.log("ClientStore.emitChange(GET_CLIENT)", "clientStore.js");
 	      break;
 	  }
 	});
@@ -24434,8 +24432,8 @@
 	var Link = Router.Link;
 	var AnswerLine = __webpack_require__(210);
 	//var Db = require("../common/DB");
-	var ClientActions = __webpack_require__(198);
-	var ClientStore = __webpack_require__(205);
+	var AnswerActions = __webpack_require__(217);
+	var AnswerStore = __webpack_require__(218);
 
 	var income = React.createClass({
 		displayName: "income",
@@ -24452,7 +24450,7 @@
 		getInitialState: function getInitialState() {
 			// NOTE: Probably better as an array rather than objects, but don't
 			// want to dwell on it too much at the moment!
-			var income = ClientStore.getIncome(); // Db.getIncome();
+			var income = AnswerStore.getIncome();
 			var IS_BLANK = undefined;
 
 			// init dataitems (yes, there WILL be a better way to do this!)
@@ -24513,7 +24511,9 @@
 			event.preventDefault();
 
 			// we're only going to localStorage, so just save the whole thing
-			Db.saveIncome(this.state.Income);
+			//Db.saveIncome(this.state.Income);
+			console.log("income::saveClient -> AnswerActions::saveIncome");
+			AnswerActions.saveIncome(this.state.Income);
 
 			// this.transitionTo("home");
 			// no longer dirty!
@@ -24524,8 +24524,9 @@
 		},
 
 		render: function render() {
-			var formIsDirty;
+			console.log("income::render");
 
+			var formIsDirty;
 			if (this.state.dirty) {
 				formIsDirty = React.createElement(
 					"span",
@@ -24951,6 +24952,7 @@
 		},
 
 		getIncome: function getIncome() {
+			console.log("DB::getIncome");
 			var data = null,
 			    income = null;
 
@@ -24958,14 +24960,12 @@
 			data = localStorage["INCOME"];
 			income = JSON.parse(data);
 
-			console.log("INCOME loaded");
-
 			return income;
 		},
 
 		saveIncome: function saveIncome(income) {
+			console.log("DB::saveIncome");
 			localStorage["INCOME"] = JSON.stringify(income);
-			console.log("INCOME saved");
 			return income;
 		},
 
@@ -24984,6 +24984,7 @@
 		},
 
 		createClient: function createClient() {
+			console.log("DB::createClient");
 			// start afresh
 			localStorage.clear();
 
@@ -25008,6 +25009,7 @@
 		},
 
 		initDB: function initDB(withIncrementor) {
+			console.log("DB::initDB");
 			var incrementer = localStorage["MAX_ID"];
 			if (incrementer !== undefined) {
 				// already done, so skip this step
@@ -25046,23 +25048,130 @@
 
 	var Dispatcher = __webpack_require__(206);
 	var ActionTypes = __webpack_require__(203);
-	var DB = __webpack_require__(215);
+	var Db = __webpack_require__(215);
 
 	var InitialiseActions = {
 	  initApp: function initApp() {
-	    console.log("APP INIT");
+	    console.log("initialiseActions::initApp -> dispatch(INITIALISE)");
 	    Dispatcher.dispatch({
 	      actionType: ActionTypes.INITIALISE,
 	      initialData: {
-	        incrementer: DB.initDB(999),
-	        client: DB.getClient(),
-	        income: DB.getIncome()
+	        incrementer: Db.initDB(999),
+	        client: Db.getClient(),
+	        income: Db.getIncome()
 	      }
 	    });
 	  }
 	};
 
 	module.exports = InitialiseActions;
+
+/***/ },
+/* 217 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var Dispatcher = __webpack_require__(206);
+	var ActionTypes = __webpack_require__(203);
+	var Db = __webpack_require__(215);
+
+	var AnswerActions = {
+
+	  getIncome: function getIncome() {
+	    console.log("answerActions::getIncome -> dispatch(GET_INCOME)");
+
+	    var incomeData = Db.getIncome();
+
+	    // Tell everything else that income was loaded.bs.modal
+	    Dispatcher.dispatch({
+	      actionType: ActionTypes.GET_INCOME,
+	      income: incomeData
+	    });
+	  }, // getIncome
+
+	  saveIncome: function saveIncome(income) {
+	    var updatedIncome = Db.saveIncome(income);
+
+	    console.log("answerActions::saveIncome -> dispatch(SAVE_INCOME)");
+
+	    Dispatcher.dispatch({
+	      actionType: ActionTypes.SAVE_INCOME,
+	      income: updatedIncome
+	    });
+	  } };
+
+	// saveIncome
+
+	module.exports = AnswerActions;
+
+/***/ },
+/* 218 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var CHANGE_EVENT = "change";
+	var Dispatcher = __webpack_require__(206);
+	var ActionTypes = __webpack_require__(203);
+	var Events = __webpack_require__(207);
+	var EventEmitter = Events.EventEmitter;
+	var Assign = __webpack_require__(208);
+
+	var _income = null;
+
+	var AnswerStore = Assign({}, EventEmitter.prototype, {
+
+	  addChangeListener: function addChangeListener(callback) {
+	    console.log("AnswerStore::addChangeListener");
+	    this.on(CHANGE_EVENT, callback);
+	  },
+
+	  removeChangeListener: function removeChangeListener(callback) {
+	    console.log("AnswerStore::removeChangeListener");
+	    this.removeListener(CHANGE_EVENT, callback);
+	  },
+
+	  emitChange: function emitChange() {
+	    console.log("AnswerStore::emitChange");
+	    this.emit(CHANGE_EVENT);
+	  },
+
+	  getIncome: function getIncome() {
+	    return _income;
+	  }
+
+	});
+
+	Dispatcher.register(function (action) {
+	  switch (action.actionType) {
+	    case ActionTypes.INITIALISE:
+	      _income = action.initialData.income;
+	      AnswerStore.emitChange();
+	      console.log("AnswerStore::emitChange(INITIALISE)");
+	      break;
+
+	    case ActionTypes.GET_INCOME:
+	      _income = action.income;
+
+	      // Tell the rest of the UI that a Client has been created
+	      AnswerStore.emitChange();
+
+	      console.log("AnswerStore::emitChange(GET_INCOME)");
+	      break;
+
+	    case ActionTypes.SAVE_INCOME:
+	      _income = action.income;
+
+	      // Comm out
+	      AnswerStore.emitChange();
+	      console.log("AnswerStore::emitChange(SAVE_INCOME)");
+	      break;
+
+	  }
+	});
+
+	module.exports = AnswerStore;
 
 /***/ }
 /******/ ]);

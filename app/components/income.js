@@ -5,8 +5,8 @@ var Router = require("react-router");
 var Link = Router.Link;
 var AnswerLine = require("./answer-line");
 //var Db = require("../common/DB");
-var ClientActions = require("../actions/clientActions");
-var ClientStore = require("../stores/clientStore");
+var AnswerActions = require("../actions/answerActions");
+var AnswerStore = require("../stores/answerStore");
 
 
 var income = React.createClass({
@@ -24,7 +24,7 @@ var income = React.createClass({
 	getInitialState: function() {
 		// NOTE: Probably better as an array rather than objects, but don't
 		// want to dwell on it too much at the moment!
-		var income = ClientStore.getIncome(); // Db.getIncome();
+		var income = AnswerStore.getIncome();
 		var IS_BLANK = undefined;
 
 		// init dataitems (yes, there WILL be a better way to do this!)
@@ -85,7 +85,9 @@ var income = React.createClass({
 		event.preventDefault();
 
 		// we're only going to localStorage, so just save the whole thing
-		Db.saveIncome(this.state.Income);
+		//Db.saveIncome(this.state.Income);
+		console.log("income::saveClient -> AnswerActions::saveIncome");
+		AnswerActions.saveIncome(this.state.Income);
 
 		// this.transitionTo("home");
 		// no longer dirty!
@@ -96,8 +98,9 @@ var income = React.createClass({
 	},
 
 	render: function() {
-		var formIsDirty;
+		console.log("income::render");
 
+		var formIsDirty;
 		if (this.state.dirty) {
 			formIsDirty = <span className='mui-pull-right form-dirty'>*</span>;
 		}

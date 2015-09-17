@@ -7,52 +7,58 @@ var Events = require("events");
 var EventEmitter = Events.EventEmitter;
 var Assign = require("object-assign");
 
-var _client = null;
 var _income = null;
 
-var ClientStore = Assign({}, EventEmitter.prototype, {
+var AnswerStore = Assign({}, EventEmitter.prototype, {
 
   addChangeListener: function(callback) {
-    console.log("ClientStore::addChangeListener -> this.on(CHANGE_EVENT, ...)");
+    console.log("AnswerStore::addChangeListener");
     this.on(CHANGE_EVENT, callback);
   },
 
   removeChangeListener: function(callback) {
-    console.log("ClientStore::removeChangeListener -> this.removeListener(CHANGE_EVENT, ...)");
+    console.log("AnswerStore::removeChangeListener");
     this.removeListener(CHANGE_EVENT, callback);
   },
 
   emitChange: function() {
-    console.log("ClientStore::emitChange -> this.emit(CHANGE_EVENT)");
+    console.log("AnswerStore::emitChange");
     this.emit(CHANGE_EVENT);
   },
 
-  getClient: function() {
-    return _client;
-  },
+  getIncome: function() {
+    return _income;
+  }
 
 });
 
 Dispatcher.register(function(action) {
   switch (action.actionType) {
     case ActionTypes.INITIALISE:
-      _client = action.initialData.client;
       _income = action.initialData.income;
+      AnswerStore.emitChange();
+      console.log("AnswerStore::emitChange(INITIALISE)");
+    break;
 
-      console.log("ClientStore.emitChange(INITIALISE)", "clientStore.js");
-      ClientStore.emitChange();
-      break;
-
-    case ActionTypes.GET_CLIENT:
-      _client = action.client;
+    case ActionTypes.GET_INCOME:
+      _income = action.income;
 
       // Tell the rest of the UI that a Client has been created
-      ClientStore.emitChange();
+      AnswerStore.emitChange();
 
-      console.log("ClientStore.emitChange(GET_CLIENT)", "clientStore.js");
+      console.log("AnswerStore::emitChange(GET_INCOME)");
     break;
+
+    case ActionTypes.SAVE_INCOME:
+      _income = action.income;
+
+      // Comm out
+      AnswerStore.emitChange();
+      console.log("AnswerStore::emitChange(SAVE_INCOME)");
+    break;
+
   }
 
 });
 
-module.exports = ClientStore;
+module.exports = AnswerStore;

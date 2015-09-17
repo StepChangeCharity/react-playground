@@ -2,17 +2,17 @@
 
 var Dispatcher = require("../dispatcher/appDispatcher");
 var ActionTypes = require("../constants/actionTypes");
-var DB = require("../common/DB");
+var Db = require("../common/DB");
 
 var InitialiseActions = {
   initApp: function() {
-    console.log("APP INIT");
+    console.log("initialiseActions::initApp -> dispatch(INITIALISE)");
     Dispatcher.dispatch({
       actionType: ActionTypes.INITIALISE,
       initialData: {
-        incrementer: DB.initDB(999),
-        client: DB.getClient(),
-        income: DB.getIncome()
+        incrementer: Db.initDB(999),
+        client: Db.getClient(),
+        income: Db.getIncome()
       }
     });
   }
