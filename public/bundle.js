@@ -23583,6 +23583,7 @@
 	var React = __webpack_require__(1);
 	var ClientActions = __webpack_require__(198);
 	var ClientStore = __webpack_require__(205);
+	var Menu = __webpack_require__(219);
 
 	var home = React.createClass({
 		displayName: "home",
@@ -23604,34 +23605,60 @@
 		render: function render() {
 			return React.createElement(
 				"div",
-				{ id: "home" },
+				{ id: "content-wrapper" },
+				React.createElement(Menu, null),
 				React.createElement(
 					"div",
-					{ className: "mui-panel" },
-					React.createElement(
-						"h2",
-						null,
-						"Your Debt Remedy"
-					),
+					{ id: "appbar-placeholder", className: "mui-appbar" },
 					React.createElement(
 						"p",
-						null,
-						"Some blurb about ",
-						React.createElement(
-							"i",
-							null,
-							"Your Debt Remedy"
-						),
-						", it's ace, etc."
-					),
+						{ className: "mui-text-display1 mui-text-white" },
+						"Debt Remedy: Income"
+					)
+				),
+				React.createElement(
+					"div",
+					{ className: "mui-container-fluid" },
 					React.createElement(
-						"p",
-						null,
-						"Your web number: ",
+						"div",
+						{ className: "mui-row" },
 						React.createElement(
-							"strong",
-							null,
-							this.state.WebNumber
+							"div",
+							{ className: "mui-col-md-10 mui-col-md-offset-1" },
+							React.createElement(
+								"div",
+								{ id: "home" },
+								React.createElement(
+									"div",
+									{ className: "mui-panel" },
+									React.createElement(
+										"h2",
+										null,
+										"Your Debt Remedy"
+									),
+									React.createElement(
+										"p",
+										null,
+										"Some blurb about ",
+										React.createElement(
+											"i",
+											null,
+											"Your Debt Remedy"
+										),
+										", it's ace, etc."
+									),
+									React.createElement(
+										"p",
+										null,
+										"Your web number: ",
+										React.createElement(
+											"strong",
+											null,
+											this.state.WebNumber
+										)
+									)
+								)
+							)
 						)
 					)
 				)
@@ -24431,6 +24458,8 @@
 	var Router = __webpack_require__(157);
 	var Link = Router.Link;
 	var AnswerLine = __webpack_require__(210);
+	var Menu = __webpack_require__(219);
+	var BudgetSummary = __webpack_require__(220);
 	//var Db = require("../common/DB");
 	var AnswerActions = __webpack_require__(217);
 	var AnswerStore = __webpack_require__(218);
@@ -24537,37 +24566,64 @@
 
 			return React.createElement(
 				"div",
-				null,
+				{ id: "content-wrapper" },
+				React.createElement(Menu, null),
 				React.createElement(
-					"form",
-					null,
+					"div",
+					{ id: "appbar-placeholder", className: "mui-appbar" },
 					React.createElement(
-						"h2",
-						null,
-						"Income ",
-						formIsDirty,
-						" "
-					),
-					React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer }),
-					React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer, supports: "W/F/4/Y" }),
-					React.createElement(AnswerLine, { Answer: this.state.Income.ChildSupport, onChange: this.setAnswer }),
+						"p",
+						{ className: "mui-text-display1 mui-text-white" },
+						"Debt Remedy: Income"
+					)
+				),
+				React.createElement(
+					"div",
+					{ className: "mui-container-fluid" },
 					React.createElement(
-						"button",
-						{ type: "submit", className: "mui-btn", "data-mui-color": "accent", onClick: this.saveIncome },
-						"Save"
-					),
-					React.createElement(
-						"span",
-						{ className: "mui-pull-right" },
+						"div",
+						{ className: "mui-row" },
 						React.createElement(
-							Link,
-							{ to: "expenditure", className: "mui-btn", "data-mui-color": "primary" },
-							"« Back"
+							"div",
+							{ className: "mui-col-md-6 mui-col-md-offset-1" },
+							React.createElement(
+								"form",
+								null,
+								React.createElement(
+									"h2",
+									null,
+									"Income ",
+									formIsDirty,
+									" "
+								),
+								React.createElement(AnswerLine, { Answer: this.state.Income.CltWork, onChange: this.setAnswer }),
+								React.createElement(AnswerLine, { Answer: this.state.Income.PtrWork, onChange: this.setAnswer, supports: "W/F/4/Y" }),
+								React.createElement(AnswerLine, { Answer: this.state.Income.ChildSupport, onChange: this.setAnswer }),
+								React.createElement(
+									"button",
+									{ type: "submit", className: "mui-btn", "data-mui-color": "accent", onClick: this.saveIncome },
+									"Save"
+								),
+								React.createElement(
+									"span",
+									{ className: "mui-pull-right" },
+									React.createElement(
+										Link,
+										{ to: "expenditure", className: "mui-btn", "data-mui-color": "primary" },
+										"« Back"
+									),
+									React.createElement(
+										Link,
+										{ to: "assets", className: "mui-btn", "data-mui-color": "primary" },
+										"Next »"
+									)
+								)
+							)
 						),
 						React.createElement(
-							Link,
-							{ to: "assets", className: "mui-btn", "data-mui-color": "primary" },
-							"Next »"
+							"div",
+							{ className: "mui-col-md-3 mui-col-md-offset-1" },
+							React.createElement(BudgetSummary, null)
 						)
 					)
 				)
@@ -25172,6 +25228,224 @@
 	});
 
 	module.exports = AnswerStore;
+
+/***/ },
+/* 219 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	var menu = React.createClass({
+	  displayName: "menu",
+
+	  getInitialState: function getInitialState() {
+	    return {};
+	  },
+
+	  render: function render() {
+	    console.log("menu::render");
+
+	    return React.createElement(
+	      "div",
+	      { id: "sidedrawer" },
+	      React.createElement(
+	        "nav",
+	        { id: "sidenav" },
+	        React.createElement(
+	          "div",
+	          null,
+	          React.createElement(
+	            "h2",
+	            { "class": "mui-navbar-line-height" },
+	            React.createElement(
+	              "a",
+	              { href: "/" },
+	              "DR"
+	            )
+	          )
+	        ),
+	        React.createElement("div", { "class": "mui-divider" }),
+	        React.createElement(
+	          "ul",
+	          null,
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/" },
+	              "Home"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/debts" },
+	              "Debts"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/assets" },
+	              "Assets"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/income" },
+	              "Income"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/expenditure" },
+	              "Expenditure"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/advice" },
+	              "Advice"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/home" },
+	              "You"
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+
+	});
+
+	module.exports = menu;
+
+/***/ },
+/* 220 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	var budgetSummary = React.createClass({
+	  displayName: "budgetSummary",
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      totalIncome: 0,
+	      totalExpenditure: 0,
+	      surplus: 0
+	    };
+	  },
+
+	  render: function render() {
+	    console.log("budgetSummary::render");
+
+	    return React.createElement(
+	      "div",
+	      null,
+	      React.createElement(
+	        "h2",
+	        null,
+	        "Summary"
+	      ),
+	      React.createElement(
+	        "table",
+	        { className: "mui-table mui-panel" },
+	        React.createElement(
+	          "thead",
+	          null,
+	          React.createElement(
+	            "tr",
+	            null,
+	            React.createElement(
+	              "th",
+	              null,
+	              "Field"
+	            ),
+	            React.createElement(
+	              "th",
+	              null,
+	              "Amount"
+	            )
+	          )
+	        ),
+	        React.createElement(
+	          "tbody",
+	          null,
+	          React.createElement(
+	            "tr",
+	            null,
+	            React.createElement(
+	              "td",
+	              null,
+	              "Income"
+	            ),
+	            React.createElement(
+	              "td",
+	              null,
+	              this.state.totalIncome
+	            )
+	          ),
+	          React.createElement(
+	            "tr",
+	            null,
+	            React.createElement(
+	              "td",
+	              null,
+	              "Expenditure"
+	            ),
+	            React.createElement(
+	              "td",
+	              null,
+	              this.state.totalExpenditure
+	            )
+	          ),
+	          React.createElement(
+	            "tr",
+	            null,
+	            React.createElement(
+	              "td",
+	              null,
+	              "Surplus"
+	            ),
+	            React.createElement(
+	              "td",
+	              null,
+	              this.state.surplus
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+
+	});
+
+	module.exports = budgetSummary;
 
 /***/ }
 /******/ ]);

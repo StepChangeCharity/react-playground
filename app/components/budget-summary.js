@@ -5,19 +5,21 @@ var React = require("react");
 
 var budgetSummary = React.createClass({
   getInitialState: function() {
-    totalIncome: 0,
-    totalExpenditure: 0,
-    surplus: 0
+    return {
+      totalIncome: 0,
+      totalExpenditure: 0,
+      surplus: 0
+    }
   },
 
   render: function() {
     console.log("budgetSummary::render");
-    
+
     return (
       <div>
-        <h3>Summary</h3>
+        <h2>Summary</h2>
 
-        <table class="mui-table">
+        <table className="mui-table mui-panel">
           <thead>
             <tr><th>Field</th><th>Amount</th></tr>
           </thead>

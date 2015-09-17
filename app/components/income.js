@@ -4,6 +4,8 @@ var React = require("react");
 var Router = require("react-router");
 var Link = Router.Link;
 var AnswerLine = require("./answer-line");
+var Menu = require("./menu");
+var BudgetSummary = require("./budget-summary");
 //var Db = require("../common/DB");
 var AnswerActions = require("../actions/answerActions");
 var AnswerStore = require("../stores/answerStore");
@@ -106,23 +108,39 @@ var income = React.createClass({
 		}
 
 		return (
-			<div>
-				<form>
-					<h2>Income {formIsDirty} </h2>
+			<div id="content-wrapper">
+				<Menu />
 
-					<AnswerLine Answer={this.state.Income.CltWork} onChange={this.setAnswer} />
+				<div id="appbar-placeholder" className="mui-appbar">
+					<p className="mui-text-display1 mui-text-white">Debt Remedy: Income</p>
+				</div>
 
-					{/* Note the lack of a monthly option*/}
-					<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} supports="W/F/4/Y" />
+				<div className="mui-container-fluid">
+					<div className="mui-row">
+						<div className="mui-col-md-6 mui-col-md-offset-1">
+							<form>
+								<h2>Income {formIsDirty} </h2>
 
-					<AnswerLine Answer={this.state.Income.ChildSupport} onChange={this.setAnswer} />
+								<AnswerLine Answer={this.state.Income.CltWork} onChange={this.setAnswer} />
 
-					<button type="submit" className="mui-btn" data-mui-color="accent" onClick={this.saveIncome}>Save</button>
-					<span className="mui-pull-right">
-						<Link to="expenditure" className="mui-btn" data-mui-color="primary">&laquo; Back</Link>
-						<Link to="assets" className="mui-btn" data-mui-color="primary">Next &raquo;</Link>
-					</span>
-				</form>
+								{/* Note the lack of a monthly option*/}
+								<AnswerLine Answer={this.state.Income.PtrWork} onChange={this.setAnswer} supports="W/F/4/Y" />
+
+								<AnswerLine Answer={this.state.Income.ChildSupport} onChange={this.setAnswer} />
+
+								<button type="submit" className="mui-btn" data-mui-color="accent" onClick={this.saveIncome}>Save</button>
+								<span className="mui-pull-right">
+									<Link to="expenditure" className="mui-btn" data-mui-color="primary">&laquo; Back</Link>
+									<Link to="assets" className="mui-btn" data-mui-color="primary">Next &raquo;</Link>
+								</span>
+							</form>
+						</div>
+						<div className="mui-col-md-3 mui-col-md-offset-1">
+							<BudgetSummary />
+						</div>
+					</div>
+				</div>
+
 			</div>
 		)
 	}
