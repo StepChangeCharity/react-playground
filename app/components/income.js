@@ -4,7 +4,10 @@ var React = require("react");
 var Router = require("react-router");
 var Link = Router.Link;
 var AnswerLine = require("./answer-line");
-var Db = require("../common/DB");
+//var Db = require("../common/DB");
+var ClientActions = require("../actions/clientActions");
+var ClientStore = require("../stores/clientStore");
+
 
 var income = React.createClass({
 	mixins: [
@@ -21,7 +24,7 @@ var income = React.createClass({
 	getInitialState: function() {
 		// NOTE: Probably better as an array rather than objects, but don't
 		// want to dwell on it too much at the moment!
-		var income = Db.getIncome();
+		var income = ClientStore.getIncome(); // Db.getIncome();
 		var IS_BLANK = undefined;
 
 		// init dataitems (yes, there WILL be a better way to do this!)
@@ -87,6 +90,9 @@ var income = React.createClass({
 		// this.transitionTo("home");
 		// no longer dirty!
 		this.setState({dirty: false});
+
+		// TODO:
+		// AnswerActions.saveIncome(this.state.Income);
 	},
 
 	render: function() {

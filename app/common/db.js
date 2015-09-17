@@ -2,7 +2,7 @@
 
 var DB = {
 
-	getClientNumber: function() {
+	getClient: function() {
 		var wn = null;
 
 		this.ensureHasAccount();
@@ -44,9 +44,14 @@ var DB = {
 	},
 
 	createClient: function() {
+		// start afresh
+		localStorage.clear();
+
 		var db = null;
 		var webNumber = "";
 		var nextId = localStorage["MAX_ID"];
+		if (nextId === undefined)
+			nextId = 999;
 		nextId++;
 
 		webNumber = "W" + nextId.toString();
@@ -63,12 +68,15 @@ var DB = {
 		return db;
 	},
 
-	initDB: function() {
+	initDB: function(withIncrementor) {
 		var incrementer = localStorage["MAX_ID"];
-		if (incrementer === undefined) {
-			incrementer = 999;
-			localStorage["MAX_ID"] = incrementer;
+		if (incrementer !== undefined) {
+			// already done, so skip this step
+			return;
 		}
+
+		// initialise with the given incrementer
+		localStorage["MAX_ID"] = withIncrementor;
 	},
 
 
