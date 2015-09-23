@@ -24563,6 +24563,8 @@
 					"*"
 				);
 			}
+			var income = this.state.Income;
+			var totalIncome = parseInt(income.CltWork.Amount) + parseInt(income.PtrWork.Amount) + parseInt(income.ChildSupport.Amount);
 
 			return React.createElement(
 				"div",
@@ -24623,7 +24625,7 @@
 						React.createElement(
 							"div",
 							{ className: "mui-col-md-3 mui-col-md-offset-1" },
-							React.createElement(BudgetSummary, null)
+							React.createElement(BudgetSummary, { totalIncome: totalIncome, totalExpenditure: 159 })
 						)
 					)
 				)
@@ -24752,7 +24754,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
-	var AccountSummary = __webpack_require__(212);
+	var AmountSummary = __webpack_require__(212);
 
 	var Number = React.createClass({
 	  displayName: "Number",
@@ -24785,7 +24787,7 @@
 	        React.createElement(
 	          "span",
 	          { className: "mui-pull-right" },
-	          React.createElement(AccountSummary, {
+	          React.createElement(AmountSummary, {
 	            Amount: this.props.value,
 	            Frequency: this.props.currentFrequency
 	          })
@@ -25194,6 +25196,7 @@
 	  },
 
 	  getIncome: function getIncome() {
+	    console.log("AnswerStore::getIncome");
 	    return _income;
 	  }
 
@@ -25258,7 +25261,7 @@
 	          null,
 	          React.createElement(
 	            "h2",
-	            { "class": "mui-navbar-line-height" },
+	            { className: "mui-navbar-line-height" },
 	            React.createElement(
 	              "a",
 	              { href: "/" },
@@ -25266,7 +25269,7 @@
 	            )
 	          )
 	        ),
-	        React.createElement("div", { "class": "mui-divider" }),
+	        React.createElement("div", { className: "mui-divider" }),
 	        React.createElement(
 	          "ul",
 	          null,
@@ -25349,6 +25352,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
+	var AmountSummary = __webpack_require__(212);
 
 	var budgetSummary = React.createClass({
 	  displayName: "budgetSummary",
@@ -25363,6 +25367,10 @@
 
 	  render: function render() {
 	    console.log("budgetSummary::render");
+	    var income = React.createElement(AmountSummary, { Amount: this.props.totalIncome, Frequency: "Monthly" });
+	    var expenditure = React.createElement(AmountSummary, { Amount: this.props.totalExpenditure, Frequency: "Monthly" });
+	    var totalSurplus = this.props.totalIncome - this.props.totalExpenditure;
+	    var surplus = React.createElement(AmountSummary, { Amount: totalSurplus, Frequency: "Monthly" });
 
 	    return React.createElement(
 	      "div",
@@ -25407,7 +25415,7 @@
 	            React.createElement(
 	              "td",
 	              null,
-	              this.state.totalIncome
+	              income
 	            )
 	          ),
 	          React.createElement(
@@ -25421,7 +25429,7 @@
 	            React.createElement(
 	              "td",
 	              null,
-	              this.state.totalExpenditure
+	              expenditure
 	            )
 	          ),
 	          React.createElement(
@@ -25435,7 +25443,7 @@
 	            React.createElement(
 	              "td",
 	              null,
-	              this.state.surplus
+	              surplus
 	            )
 	          )
 	        )

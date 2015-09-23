@@ -14,9 +14,9 @@ var menu = React.createClass({
       <div id="sidedrawer">
     		<nav id="sidenav">
     			<div>
-    				<h2 class="mui-navbar-line-height"><a href="/">DR</a></h2>
+    				<h2 className="mui-navbar-line-height"><a href="/">DR</a></h2>
     			</div>
-    			<div class="mui-divider"></div>
+    			<div className="mui-divider"></div>
     			<ul>
     				<li><a href="#/">Home</a></li>
     				<li><a href="#/debts">Debts</a></li>

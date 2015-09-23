@@ -1,7 +1,7 @@
 "use strict";
 
 var React = require("react");
-var AccountSummary = require("./amount-summary");
+var AmountSummary = require("./amount-summary");
 
 var Number = React.createClass({
   propTypes: {
@@ -29,7 +29,7 @@ var Number = React.createClass({
         <label htmlFor={this.props.name}>
           {this.props.label}
           <span className="mui-pull-right">
-            <AccountSummary
+            <AmountSummary
               Amount={this.props.value}
               Frequency={this.props.currentFrequency}
             />

@@ -27,6 +27,7 @@ var AnswerStore = Assign({}, EventEmitter.prototype, {
   },
 
   getIncome: function() {
+    console.log("AnswerStore::getIncome");
     return _income;
   }
 

@@ -106,6 +106,8 @@ var income = React.createClass({
 		if (this.state.dirty) {
 			formIsDirty = <span className='mui-pull-right form-dirty'>*</span>;
 		}
+		var income = this.state.Income;
+		var totalIncome = parseInt(income.CltWork.Amount) + parseInt(income.PtrWork.Amount) + parseInt(income.ChildSupport.Amount);
 
 		return (
 			<div id="content-wrapper">
@@ -136,7 +138,7 @@ var income = React.createClass({
 							</form>
 						</div>
 						<div className="mui-col-md-3 mui-col-md-offset-1">
-							<BudgetSummary />
+							<BudgetSummary totalIncome={totalIncome} totalExpenditure={159} />
 						</div>
 					</div>
 				</div>
