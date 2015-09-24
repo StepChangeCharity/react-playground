@@ -7,5 +7,6 @@ module.exports = keyMirror({
   INITIALISE: null,
   GET_CLIENT: null,
   GET_INCOME: null,
+  CHANGE_INCOME: null,
   SAVE_INCOME: null,
 });

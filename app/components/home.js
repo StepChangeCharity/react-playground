@@ -1,7 +1,6 @@
 "use strict";
 
 var React = require("react");
-var ClientActions = require("../actions/clientActions");
 var ClientStore = require("../stores/clientStore");
 var Menu = require("./menu");
 

@@ -31,6 +31,15 @@ var AnswerActions = {
 
   }, // saveIncome
 
+  changeIncome: function(answer) {
+    console.log("answerActions::changeIncome -> dispath(CHANGE_INCOME)");
+
+    Dispatcher.dispatch({
+      actionType: ActionTypes.CHANGE_INCOME,
+      answer: answer
+    });
+  }, // changeIncome
+
 };
 
 module.exports = AnswerActions;

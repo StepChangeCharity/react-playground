@@ -2,22 +2,33 @@
 
 var React = require("react");
 var AmountSummary = require("../common/amount-summary");
+var AnswerStore = require("../stores/answerStore");
 
 
 var budgetSummary = React.createClass({
   getInitialState: function() {
     return {
-      totalIncome: 0,
-      totalExpenditure: 0,
-      surplus: 0
+      totalIncome: this.props.totalIncome,
+      totalExpenditure: this.props.totalExpenditure
     }
   },
 
+  componentWillMount: function() {
+    AnswerStore.addChangeListener(this._onChange);
+  },
+  componentWillUnmount: function() {
+    AnswerStore.removeChangeListener(this._onChange);
+  },
+
+  _onChange: function() {
+		this.setState({totalIncome: AnswerStore.getTotalIncome()});
+	},
+
   render: function() {
     console.log("budgetSummary::render");
-    var income = <AmountSummary Amount={this.props.totalIncome} Frequency="Monthly" />
-    var expenditure = <AmountSummary Amount={this.props.totalExpenditure} Frequency="Monthly" />
-    var totalSurplus = this.props.totalIncome - this.props.totalExpenditure;
+    var income = <AmountSummary Amount={this.state.totalIncome} Frequency="Monthly" />
+    var expenditure = <AmountSummary Amount={this.state.totalExpenditure} Frequency="Monthly" />
+    var totalSurplus = this.state.totalIncome - this.state.totalExpenditure;
     var surplus = <AmountSummary Amount={totalSurplus} Frequency="Monthly" />
 
     return (

@@ -80,6 +80,8 @@ var income = React.createClass({
 		this.state.Income[dataItem][field] = value;
 		this.setState({dirty: true});
 
+		AnswerActions.changeIncome(this.state.Income[dataItem]);
+
 		return this.setState( {key: this.state.Income[dataItem]} );
 	},
 

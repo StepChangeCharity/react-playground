@@ -12,21 +12,6 @@ var _income = null;
 
 var ClientStore = Assign({}, EventEmitter.prototype, {
 
-  addChangeListener: function(callback) {
-    console.log("ClientStore::addChangeListener -> this.on(CHANGE_EVENT, ...)");
-    this.on(CHANGE_EVENT, callback);
-  },
-
-  removeChangeListener: function(callback) {
-    console.log("ClientStore::removeChangeListener -> this.removeListener(CHANGE_EVENT, ...)");
-    this.removeListener(CHANGE_EVENT, callback);
-  },
-
-  emitChange: function() {
-    console.log("ClientStore::emitChange -> this.emit(CHANGE_EVENT)");
-    this.emit(CHANGE_EVENT);
-  },
-
   getClient: function() {
     return _client;
   },
@@ -40,17 +25,8 @@ Dispatcher.register(function(action) {
       _income = action.initialData.income;
 
       console.log("ClientStore.emitChange(INITIALISE)", "clientStore.js");
-      ClientStore.emitChange();
+      //ClientStore.emitChange();
       break;
-
-    case ActionTypes.GET_CLIENT:
-      _client = action.client;
-
-      // Tell the rest of the UI that a Client has been created
-      ClientStore.emitChange();
-
-      console.log("ClientStore.emitChange(GET_CLIENT)", "clientStore.js");
-    break;
   }
 
 });

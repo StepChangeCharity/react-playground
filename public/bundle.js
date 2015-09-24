@@ -50,7 +50,7 @@
 	var Router = __webpack_require__(157);
 	var routes = __webpack_require__(196);
 	//var db = require("./common/DB");
-	var InitialiseActions = __webpack_require__(216);
+	var InitialiseActions = __webpack_require__(218);
 
 	//db.initDB();
 	InitialiseActions.initApp();
@@ -23581,9 +23581,8 @@
 	"use strict";
 
 	var React = __webpack_require__(1);
-	var ClientActions = __webpack_require__(198);
 	var ClientStore = __webpack_require__(205);
-	var Menu = __webpack_require__(219);
+	var Menu = __webpack_require__(208);
 
 	var home = React.createClass({
 		displayName: "home",
@@ -23669,34 +23668,20 @@
 	module.exports = home;
 
 /***/ },
-/* 198 */
+/* 198 */,
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var Dispather = __webpack_require__(206);
-	var ActionTypes = __webpack_require__(203);
-	var Db = __webpack_require__(215);
+	var Dispatcher = __webpack_require__(200).Dispatcher;
 
-	var ClientActions = {
+	// Flux Dispatcher is a singleton
+	var appDispatcher = new Dispatcher();
 
-	  getClient: function getClient(client) {
-	    var newClient = Db.getClient();
-
-	    // Go tell all the stores that a Client was created
-	    console.log("clientActions::getClient -> dispatch(GET_CLIENT)");
-	    Dispatcher.dispatch({
-	      actionType: ActionTypes.GET_CLIENT,
-	      client: newClient
-	    });
-	  } };
-
-	// getClient
-
-	module.exports = ClientActions;
+	module.exports = appDispatcher;
 
 /***/ },
-/* 199 */,
 /* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -24017,42 +24002,133 @@
 	  INITIALISE: null,
 	  GET_CLIENT: null,
 	  GET_INCOME: null,
+	  CHANGE_INCOME: null,
 	  SAVE_INCOME: null
 	});
 
 /***/ },
-/* 204 */,
+/* 204 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var DB = {
+
+		getClient: function getClient() {
+			var wn = null;
+
+			this.ensureHasAccount();
+			wn = localStorage["WEB_NUMBER"];
+
+			return wn;
+		},
+
+		getIncome: function getIncome() {
+			console.log("DB::getIncome");
+			var data = null,
+			    income = null;
+
+			this.ensureHasAccount();
+			data = localStorage["INCOME"];
+			income = JSON.parse(data);
+
+			return income;
+		},
+
+		saveIncome: function saveIncome(income) {
+			console.log("DB::saveIncome");
+			localStorage["INCOME"] = JSON.stringify(income);
+			return income;
+		},
+
+		ensureHasAccount: function ensureHasAccount() {
+			var data = localStorage["WEB_NUMBER"];
+			if (data !== undefined) {
+				// account already exists
+				return true;
+			}
+
+			// No account, so initial setup
+			this.createClient();
+
+			// Flag account was created
+			return true;
+		},
+
+		createClient: function createClient() {
+			console.log("DB::createClient");
+			// start afresh
+			localStorage.clear();
+
+			var db = null;
+			var webNumber = "";
+			var nextId = localStorage["MAX_ID"];
+			if (nextId === undefined) nextId = 999;
+			nextId++;
+
+			webNumber = "W" + nextId.toString();
+
+			localStorage["WEB_NUMBER"] = webNumber;
+
+			// add empty placeholders
+			localStorage["INCOME"] = "{}";
+			localStorage["EXPENDITURE"] = "{}";
+			localStorage["DEBTS"] = "{}";
+			localStorage["ASSETS"] = "{}";
+			localStorage["YOU"] = "{}";
+
+			return db;
+		},
+
+		initDB: function initDB(withIncrementor) {
+			console.log("DB::initDB");
+			var incrementer = localStorage["MAX_ID"];
+			if (incrementer !== undefined) {
+				// already done, so skip this step
+				return;
+			}
+
+			// initialise with the given incrementer
+			localStorage["MAX_ID"] = withIncrementor;
+		}
+
+	};
+
+	module.exports = DB;
+
+	// ASYNC JSON load snippet
+	// $.ajax({
+	// 	// Hey, we're just prototyping ... stop judging me !
+	// 	async: false,
+	// 	url: "./data.js",
+	// 	dataType: "json",
+	// 	cache: false,
+	// 	success: function(data) {
+	// 		db = DB.saveBudget(data);
+	// 		console.log("Budget initialised.");
+	// 	},
+	// 	error: function(xhr, status, err) {
+	// 		console.log("error!", err);
+	// 	}
+	// });
+
+/***/ },
 /* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var CHANGE_EVENT = "change";
-	var Dispatcher = __webpack_require__(206);
+	var Dispatcher = __webpack_require__(199);
 	var ActionTypes = __webpack_require__(203);
-	var Events = __webpack_require__(207);
+	var Events = __webpack_require__(206);
 	var EventEmitter = Events.EventEmitter;
-	var Assign = __webpack_require__(208);
+	var Assign = __webpack_require__(207);
 
 	var _client = null;
 	var _income = null;
 
 	var ClientStore = Assign({}, EventEmitter.prototype, {
-
-	  addChangeListener: function addChangeListener(callback) {
-	    console.log("ClientStore::addChangeListener -> this.on(CHANGE_EVENT, ...)");
-	    this.on(CHANGE_EVENT, callback);
-	  },
-
-	  removeChangeListener: function removeChangeListener(callback) {
-	    console.log("ClientStore::removeChangeListener -> this.removeListener(CHANGE_EVENT, ...)");
-	    this.removeListener(CHANGE_EVENT, callback);
-	  },
-
-	  emitChange: function emitChange() {
-	    console.log("ClientStore::emitChange -> this.emit(CHANGE_EVENT)");
-	    this.emit(CHANGE_EVENT);
-	  },
 
 	  getClient: function getClient() {
 	    return _client;
@@ -24067,16 +24143,7 @@
 	      _income = action.initialData.income;
 
 	      console.log("ClientStore.emitChange(INITIALISE)", "clientStore.js");
-	      ClientStore.emitChange();
-	      break;
-
-	    case ActionTypes.GET_CLIENT:
-	      _client = action.client;
-
-	      // Tell the rest of the UI that a Client has been created
-	      ClientStore.emitChange();
-
-	      console.log("ClientStore.emitChange(GET_CLIENT)", "clientStore.js");
+	      //ClientStore.emitChange();
 	      break;
 	  }
 	});
@@ -24085,19 +24152,6 @@
 
 /***/ },
 /* 206 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Dispatcher = __webpack_require__(200).Dispatcher;
-
-	// Flux Dispatcher is a singleton
-	var appDispatcher = new Dispatcher();
-
-	module.exports = appDispatcher;
-
-/***/ },
-/* 207 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -24404,7 +24458,7 @@
 
 
 /***/ },
-/* 208 */
+/* 207 */
 /***/ function(module, exports) {
 
 	/* eslint-disable no-unused-vars */
@@ -24449,6 +24503,119 @@
 
 
 /***/ },
+/* 208 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	var menu = React.createClass({
+	  displayName: "menu",
+
+	  getInitialState: function getInitialState() {
+	    return {};
+	  },
+
+	  render: function render() {
+	    console.log("menu::render");
+
+	    return React.createElement(
+	      "div",
+	      { id: "sidedrawer" },
+	      React.createElement(
+	        "nav",
+	        { id: "sidenav" },
+	        React.createElement(
+	          "div",
+	          null,
+	          React.createElement(
+	            "h2",
+	            { className: "mui-navbar-line-height" },
+	            React.createElement(
+	              "a",
+	              { href: "/" },
+	              "DR"
+	            )
+	          )
+	        ),
+	        React.createElement("div", { className: "mui-divider" }),
+	        React.createElement(
+	          "ul",
+	          null,
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/" },
+	              "Home"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/debts" },
+	              "Debts"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/assets" },
+	              "Assets"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/income" },
+	              "Income"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/expenditure" },
+	              "Expenditure"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/advice" },
+	              "Advice"
+	            )
+	          ),
+	          React.createElement(
+	            "li",
+	            null,
+	            React.createElement(
+	              "a",
+	              { href: "#/home" },
+	              "You"
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+
+	});
+
+	module.exports = menu;
+
+/***/ },
 /* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -24458,11 +24625,11 @@
 	var Router = __webpack_require__(157);
 	var Link = Router.Link;
 	var AnswerLine = __webpack_require__(210);
-	var Menu = __webpack_require__(219);
-	var BudgetSummary = __webpack_require__(220);
+	var Menu = __webpack_require__(208);
+	var BudgetSummary = __webpack_require__(215);
 	//var Db = require("../common/DB");
-	var AnswerActions = __webpack_require__(217);
-	var AnswerStore = __webpack_require__(218);
+	var AnswerActions = __webpack_require__(216);
+	var AnswerStore = __webpack_require__(217);
 
 	var income = React.createClass({
 		displayName: "income",
@@ -24532,6 +24699,8 @@
 
 			this.state.Income[dataItem][field] = value;
 			this.setState({ dirty: true });
+
+			AnswerActions.changeIncome(this.state.Income[dataItem]);
 
 			return this.setState({ key: this.state.Income[dataItem] });
 		},
@@ -24994,382 +25163,40 @@
 
 /***/ },
 /* 215 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	var DB = {
-
-		getClient: function getClient() {
-			var wn = null;
-
-			this.ensureHasAccount();
-			wn = localStorage["WEB_NUMBER"];
-
-			return wn;
-		},
-
-		getIncome: function getIncome() {
-			console.log("DB::getIncome");
-			var data = null,
-			    income = null;
-
-			this.ensureHasAccount();
-			data = localStorage["INCOME"];
-			income = JSON.parse(data);
-
-			return income;
-		},
-
-		saveIncome: function saveIncome(income) {
-			console.log("DB::saveIncome");
-			localStorage["INCOME"] = JSON.stringify(income);
-			return income;
-		},
-
-		ensureHasAccount: function ensureHasAccount() {
-			var data = localStorage["WEB_NUMBER"];
-			if (data !== undefined) {
-				// account already exists
-				return true;
-			}
-
-			// No account, so initial setup
-			this.createClient();
-
-			// Flag account was created
-			return true;
-		},
-
-		createClient: function createClient() {
-			console.log("DB::createClient");
-			// start afresh
-			localStorage.clear();
-
-			var db = null;
-			var webNumber = "";
-			var nextId = localStorage["MAX_ID"];
-			if (nextId === undefined) nextId = 999;
-			nextId++;
-
-			webNumber = "W" + nextId.toString();
-
-			localStorage["WEB_NUMBER"] = webNumber;
-
-			// add empty placeholders
-			localStorage["INCOME"] = "{}";
-			localStorage["EXPENDITURE"] = "{}";
-			localStorage["DEBTS"] = "{}";
-			localStorage["ASSETS"] = "{}";
-			localStorage["YOU"] = "{}";
-
-			return db;
-		},
-
-		initDB: function initDB(withIncrementor) {
-			console.log("DB::initDB");
-			var incrementer = localStorage["MAX_ID"];
-			if (incrementer !== undefined) {
-				// already done, so skip this step
-				return;
-			}
-
-			// initialise with the given incrementer
-			localStorage["MAX_ID"] = withIncrementor;
-		}
-
-	};
-
-	module.exports = DB;
-
-	// ASYNC JSON load snippet
-	// $.ajax({
-	// 	// Hey, we're just prototyping ... stop judging me !
-	// 	async: false,
-	// 	url: "./data.js",
-	// 	dataType: "json",
-	// 	cache: false,
-	// 	success: function(data) {
-	// 		db = DB.saveBudget(data);
-	// 		console.log("Budget initialised.");
-	// 	},
-	// 	error: function(xhr, status, err) {
-	// 		console.log("error!", err);
-	// 	}
-	// });
-
-/***/ },
-/* 216 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var Dispatcher = __webpack_require__(206);
-	var ActionTypes = __webpack_require__(203);
-	var Db = __webpack_require__(215);
-
-	var InitialiseActions = {
-	  initApp: function initApp() {
-	    console.log("initialiseActions::initApp -> dispatch(INITIALISE)");
-	    Dispatcher.dispatch({
-	      actionType: ActionTypes.INITIALISE,
-	      initialData: {
-	        incrementer: Db.initDB(999),
-	        client: Db.getClient(),
-	        income: Db.getIncome()
-	      }
-	    });
-	  }
-	};
-
-	module.exports = InitialiseActions;
-
-/***/ },
-/* 217 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var Dispatcher = __webpack_require__(206);
-	var ActionTypes = __webpack_require__(203);
-	var Db = __webpack_require__(215);
-
-	var AnswerActions = {
-
-	  getIncome: function getIncome() {
-	    console.log("answerActions::getIncome -> dispatch(GET_INCOME)");
-
-	    var incomeData = Db.getIncome();
-
-	    // Tell everything else that income was loaded.bs.modal
-	    Dispatcher.dispatch({
-	      actionType: ActionTypes.GET_INCOME,
-	      income: incomeData
-	    });
-	  }, // getIncome
-
-	  saveIncome: function saveIncome(income) {
-	    var updatedIncome = Db.saveIncome(income);
-
-	    console.log("answerActions::saveIncome -> dispatch(SAVE_INCOME)");
-
-	    Dispatcher.dispatch({
-	      actionType: ActionTypes.SAVE_INCOME,
-	      income: updatedIncome
-	    });
-	  } };
-
-	// saveIncome
-
-	module.exports = AnswerActions;
-
-/***/ },
-/* 218 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var CHANGE_EVENT = "change";
-	var Dispatcher = __webpack_require__(206);
-	var ActionTypes = __webpack_require__(203);
-	var Events = __webpack_require__(207);
-	var EventEmitter = Events.EventEmitter;
-	var Assign = __webpack_require__(208);
-
-	var _income = null;
-
-	var AnswerStore = Assign({}, EventEmitter.prototype, {
-
-	  addChangeListener: function addChangeListener(callback) {
-	    console.log("AnswerStore::addChangeListener");
-	    this.on(CHANGE_EVENT, callback);
-	  },
-
-	  removeChangeListener: function removeChangeListener(callback) {
-	    console.log("AnswerStore::removeChangeListener");
-	    this.removeListener(CHANGE_EVENT, callback);
-	  },
-
-	  emitChange: function emitChange() {
-	    console.log("AnswerStore::emitChange");
-	    this.emit(CHANGE_EVENT);
-	  },
-
-	  getIncome: function getIncome() {
-	    console.log("AnswerStore::getIncome");
-	    return _income;
-	  }
-
-	});
-
-	Dispatcher.register(function (action) {
-	  switch (action.actionType) {
-	    case ActionTypes.INITIALISE:
-	      _income = action.initialData.income;
-	      AnswerStore.emitChange();
-	      console.log("AnswerStore::emitChange(INITIALISE)");
-	      break;
-
-	    case ActionTypes.GET_INCOME:
-	      _income = action.income;
-
-	      // Tell the rest of the UI that a Client has been created
-	      AnswerStore.emitChange();
-
-	      console.log("AnswerStore::emitChange(GET_INCOME)");
-	      break;
-
-	    case ActionTypes.SAVE_INCOME:
-	      _income = action.income;
-
-	      // Comm out
-	      AnswerStore.emitChange();
-	      console.log("AnswerStore::emitChange(SAVE_INCOME)");
-	      break;
-
-	  }
-	});
-
-	module.exports = AnswerStore;
-
-/***/ },
-/* 219 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(1);
-
-	var menu = React.createClass({
-	  displayName: "menu",
-
-	  getInitialState: function getInitialState() {
-	    return {};
-	  },
-
-	  render: function render() {
-	    console.log("menu::render");
-
-	    return React.createElement(
-	      "div",
-	      { id: "sidedrawer" },
-	      React.createElement(
-	        "nav",
-	        { id: "sidenav" },
-	        React.createElement(
-	          "div",
-	          null,
-	          React.createElement(
-	            "h2",
-	            { className: "mui-navbar-line-height" },
-	            React.createElement(
-	              "a",
-	              { href: "/" },
-	              "DR"
-	            )
-	          )
-	        ),
-	        React.createElement("div", { className: "mui-divider" }),
-	        React.createElement(
-	          "ul",
-	          null,
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/" },
-	              "Home"
-	            )
-	          ),
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/debts" },
-	              "Debts"
-	            )
-	          ),
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/assets" },
-	              "Assets"
-	            )
-	          ),
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/income" },
-	              "Income"
-	            )
-	          ),
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/expenditure" },
-	              "Expenditure"
-	            )
-	          ),
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/advice" },
-	              "Advice"
-	            )
-	          ),
-	          React.createElement(
-	            "li",
-	            null,
-	            React.createElement(
-	              "a",
-	              { href: "#/home" },
-	              "You"
-	            )
-	          )
-	        )
-	      )
-	    );
-	  }
-
-	});
-
-	module.exports = menu;
-
-/***/ },
-/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var React = __webpack_require__(1);
 	var AmountSummary = __webpack_require__(212);
+	var AnswerStore = __webpack_require__(217);
 
 	var budgetSummary = React.createClass({
 	  displayName: "budgetSummary",
 
 	  getInitialState: function getInitialState() {
 	    return {
-	      totalIncome: 0,
-	      totalExpenditure: 0,
-	      surplus: 0
+	      totalIncome: this.props.totalIncome,
+	      totalExpenditure: this.props.totalExpenditure
 	    };
+	  },
+
+	  componentWillMount: function componentWillMount() {
+	    AnswerStore.addChangeListener(this._onChange);
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    AnswerStore.removeChangeListener(this._onChange);
+	  },
+
+	  _onChange: function _onChange() {
+	    this.setState({ totalIncome: AnswerStore.getTotalIncome() });
 	  },
 
 	  render: function render() {
 	    console.log("budgetSummary::render");
-	    var income = React.createElement(AmountSummary, { Amount: this.props.totalIncome, Frequency: "Monthly" });
-	    var expenditure = React.createElement(AmountSummary, { Amount: this.props.totalExpenditure, Frequency: "Monthly" });
-	    var totalSurplus = this.props.totalIncome - this.props.totalExpenditure;
+	    var income = React.createElement(AmountSummary, { Amount: this.state.totalIncome, Frequency: "Monthly" });
+	    var expenditure = React.createElement(AmountSummary, { Amount: this.state.totalExpenditure, Frequency: "Monthly" });
+	    var totalSurplus = this.state.totalIncome - this.state.totalExpenditure;
 	    var surplus = React.createElement(AmountSummary, { Amount: totalSurplus, Frequency: "Monthly" });
 
 	    return React.createElement(
@@ -25454,6 +25281,160 @@
 	});
 
 	module.exports = budgetSummary;
+
+/***/ },
+/* 216 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var Dispatcher = __webpack_require__(199);
+	var ActionTypes = __webpack_require__(203);
+	var Db = __webpack_require__(204);
+
+	var AnswerActions = {
+
+	  getIncome: function getIncome() {
+	    console.log("answerActions::getIncome -> dispatch(GET_INCOME)");
+
+	    var incomeData = Db.getIncome();
+
+	    // Tell everything else that income was loaded.bs.modal
+	    Dispatcher.dispatch({
+	      actionType: ActionTypes.GET_INCOME,
+	      income: incomeData
+	    });
+	  }, // getIncome
+
+	  saveIncome: function saveIncome(income) {
+	    var updatedIncome = Db.saveIncome(income);
+
+	    console.log("answerActions::saveIncome -> dispatch(SAVE_INCOME)");
+
+	    Dispatcher.dispatch({
+	      actionType: ActionTypes.SAVE_INCOME,
+	      income: updatedIncome
+	    });
+	  }, // saveIncome
+
+	  changeIncome: function changeIncome(answer) {
+	    console.log("answerActions::changeIncome -> dispath(CHANGE_INCOME)");
+
+	    Dispatcher.dispatch({
+	      actionType: ActionTypes.CHANGE_INCOME,
+	      answer: answer
+	    });
+	  } };
+
+	// changeIncome
+
+	module.exports = AnswerActions;
+
+/***/ },
+/* 217 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var CHANGE_EVENT = "change";
+	var Dispatcher = __webpack_require__(199);
+	var ActionTypes = __webpack_require__(203);
+	var Events = __webpack_require__(206);
+	var EventEmitter = Events.EventEmitter;
+	var Assign = __webpack_require__(207);
+	var Utils = __webpack_require__(213);
+
+	var _income = null;
+	var _totalIncome = 0;
+
+	function recalculate() {
+	  // reset of course
+	  _totalIncome = 0;
+
+	  _totalIncome += parseInt(Utils.getSummary(_income.CltWork.Amount, _income.CltWork.Frequency));
+	  _totalIncome += parseInt(Utils.getSummary(_income.PtrWork.Amount, _income.PtrWork.Frequency));
+	  _totalIncome += parseInt(Utils.getSummary(_income.ChildSupport.Amount, _income.ChildSupport.Frequency));
+	};
+
+	var AnswerStore = Assign({}, EventEmitter.prototype, {
+
+	  emitChange: function emitChange() {
+	    console.log("AnswerStore::emitChange");
+	    this.emit(CHANGE_EVENT);
+	  },
+
+	  getIncome: function getIncome() {
+	    console.log("AnswerStore::getIncome");
+	    return _income;
+	  },
+
+	  getTotalIncome: function getTotalIncome() {
+	    console.log("AnswerStore::getTotalIncome");
+	    return _totalIncome;
+	  },
+
+	  addChangeListener: function addChangeListener(callback) {
+	    console.log("AnswerStore::addChangeListener");
+	    this.on(CHANGE_EVENT, callback);
+	  },
+
+	  removeChangeListener: function removeChangeListener(callback) {
+	    console.log("AnswerStore::removeChangeListener");
+	    this.removeListener(CHANGE_EVENT, callback);
+	  }
+
+	});
+
+	Dispatcher.register(function (action) {
+	  switch (action.actionType) {
+	    case ActionTypes.INITIALISE:
+	      _income = action.initialData.income;
+	      recalculate();
+	      AnswerStore.emitChange();
+	      console.log("AnswerStore::emitChange(INITIALISE)");
+	      break;
+
+	    case ActionTypes.CHANGE_INCOME:
+	      for (var i in _income) {
+	        if (_income[i].DataItem === action.answer.DataItem) {
+	          _income[i] = action.answer;
+	        }
+	      }
+	      recalculate();
+	      AnswerStore.emitChange();
+
+	      console.log("AnswerStore::emitChange(CHANGE_INCOME)");
+	      break;
+	  }
+	});
+
+	module.exports = AnswerStore;
+
+/***/ },
+/* 218 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var Dispatcher = __webpack_require__(199);
+	var ActionTypes = __webpack_require__(203);
+	var Db = __webpack_require__(204);
+
+	var InitialiseActions = {
+	  initApp: function initApp() {
+	    console.log("initialiseActions::initApp -> dispatch(INITIALISE)");
+	    Dispatcher.dispatch({
+	      actionType: ActionTypes.INITIALISE,
+	      initialData: {
+	        incrementer: Db.initDB(999),
+	        client: Db.getClient(),
+	        income: Db.getIncome()
+	      }
+	    });
+	  }
+	};
+
+	module.exports = InitialiseActions;
 
 /***/ }
 /******/ ]);
