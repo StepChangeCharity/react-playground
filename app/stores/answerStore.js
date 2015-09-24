@@ -53,14 +53,21 @@ Dispatcher.register(function(action) {
     break;
 
     case ActionTypes.CHANGE_INCOME:
-      for (var i in _income) {
-        if (_income[i].DataItem === action.answer.DataItem) {
-          _income[i] = action.answer;
+      // if answer is null, we're just initialising the total, so just recalculate
+
+      if (action.answer !== null) {
+        // specific item changed => emulate data change being permulated through the system
+        for (var i in _income) {
+          if (_income[i].DataItem === action.answer.DataItem) {
+            _income[i] = action.answer;
+          }
         }
       }
+
       recalculate();
       AnswerStore.emitChange();
-
+    break;
+    
   }
 
 });

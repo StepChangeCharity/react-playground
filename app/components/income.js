@@ -41,6 +41,11 @@ var income = React.createClass({
 		}
 	},
 
+	componentDidMount: function() {
+		// null just forces a recalculation to take place
+		AnswerActions.changeIncome(null);
+	},
+
 	addIncomeItem: function(income, dataItem, type, startAmount, startFreq, prompt) {
 		var current = income[dataItem];
 		if (current) {
@@ -58,11 +63,6 @@ var income = React.createClass({
 		};
 
 		income[dataItem] = newItem;
-	},
-
-	componentDidMount: function() {
-		//var income = Db.getIncome();
-		//this.setState({ webNumber: this.state.WebNumber });
 	},
 
 	setAnswer: function(event) {
