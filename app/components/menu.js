@@ -8,7 +8,6 @@ var menu = React.createClass({
   },
 
   render: function() {
-    console.log("menu::render");
 
     return (
       <div id="sidedrawer">

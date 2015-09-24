@@ -24024,7 +24024,6 @@
 		},
 
 		getIncome: function getIncome() {
-			console.log("DB::getIncome");
 			var data = null,
 			    income = null;
 
@@ -24036,7 +24035,6 @@
 		},
 
 		saveIncome: function saveIncome(income) {
-			console.log("DB::saveIncome");
 			localStorage["INCOME"] = JSON.stringify(income);
 			return income;
 		},
@@ -24056,7 +24054,6 @@
 		},
 
 		createClient: function createClient() {
-			console.log("DB::createClient");
 			// start afresh
 			localStorage.clear();
 
@@ -24081,7 +24078,6 @@
 		},
 
 		initDB: function initDB(withIncrementor) {
-			console.log("DB::initDB");
 			var incrementer = localStorage["MAX_ID"];
 			if (incrementer !== undefined) {
 				// already done, so skip this step
@@ -24142,7 +24138,6 @@
 	      _client = action.initialData.client;
 	      _income = action.initialData.income;
 
-	      console.log("ClientStore.emitChange(INITIALISE)", "clientStore.js");
 	      //ClientStore.emitChange();
 	      break;
 	  }
@@ -24518,7 +24513,6 @@
 	  },
 
 	  render: function render() {
-	    console.log("menu::render");
 
 	    return React.createElement(
 	      "div",
@@ -24710,7 +24704,6 @@
 
 			// we're only going to localStorage, so just save the whole thing
 			//Db.saveIncome(this.state.Income);
-			console.log("income::saveClient -> AnswerActions::saveIncome");
 			AnswerActions.saveIncome(this.state.Income);
 
 			// this.transitionTo("home");
@@ -24722,8 +24715,6 @@
 		},
 
 		render: function render() {
-			console.log("income::render");
-
 			var formIsDirty;
 			if (this.state.dirty) {
 				formIsDirty = React.createElement(
@@ -25193,7 +25184,6 @@
 	  },
 
 	  render: function render() {
-	    console.log("budgetSummary::render");
 	    var income = React.createElement(AmountSummary, { Amount: this.state.totalIncome, Frequency: "Monthly" });
 	    var expenditure = React.createElement(AmountSummary, { Amount: this.state.totalExpenditure, Frequency: "Monthly" });
 	    var totalSurplus = this.state.totalIncome - this.state.totalExpenditure;
@@ -25295,8 +25285,6 @@
 	var AnswerActions = {
 
 	  getIncome: function getIncome() {
-	    console.log("answerActions::getIncome -> dispatch(GET_INCOME)");
-
 	    var incomeData = Db.getIncome();
 
 	    // Tell everything else that income was loaded.bs.modal
@@ -25309,8 +25297,6 @@
 	  saveIncome: function saveIncome(income) {
 	    var updatedIncome = Db.saveIncome(income);
 
-	    console.log("answerActions::saveIncome -> dispatch(SAVE_INCOME)");
-
 	    Dispatcher.dispatch({
 	      actionType: ActionTypes.SAVE_INCOME,
 	      income: updatedIncome
@@ -25318,8 +25304,6 @@
 	  }, // saveIncome
 
 	  changeIncome: function changeIncome(answer) {
-	    console.log("answerActions::changeIncome -> dispath(CHANGE_INCOME)");
-
 	    Dispatcher.dispatch({
 	      actionType: ActionTypes.CHANGE_INCOME,
 	      answer: answer
@@ -25359,27 +25343,22 @@
 	var AnswerStore = Assign({}, EventEmitter.prototype, {
 
 	  emitChange: function emitChange() {
-	    console.log("AnswerStore::emitChange");
 	    this.emit(CHANGE_EVENT);
 	  },
 
 	  getIncome: function getIncome() {
-	    console.log("AnswerStore::getIncome");
 	    return _income;
 	  },
 
 	  getTotalIncome: function getTotalIncome() {
-	    console.log("AnswerStore::getTotalIncome");
 	    return _totalIncome;
 	  },
 
 	  addChangeListener: function addChangeListener(callback) {
-	    console.log("AnswerStore::addChangeListener");
 	    this.on(CHANGE_EVENT, callback);
 	  },
 
 	  removeChangeListener: function removeChangeListener(callback) {
-	    console.log("AnswerStore::removeChangeListener");
 	    this.removeListener(CHANGE_EVENT, callback);
 	  }
 
@@ -25391,7 +25370,6 @@
 	      _income = action.initialData.income;
 	      recalculate();
 	      AnswerStore.emitChange();
-	      console.log("AnswerStore::emitChange(INITIALISE)");
 	      break;
 
 	    case ActionTypes.CHANGE_INCOME:
@@ -25403,8 +25381,6 @@
 	      recalculate();
 	      AnswerStore.emitChange();
 
-	      console.log("AnswerStore::emitChange(CHANGE_INCOME)");
-	      break;
 	  }
 	});
 
@@ -25422,7 +25398,6 @@
 
 	var InitialiseActions = {
 	  initApp: function initApp() {
-	    console.log("initialiseActions::initApp -> dispatch(INITIALISE)");
 	    Dispatcher.dispatch({
 	      actionType: ActionTypes.INITIALISE,
 	      initialData: {

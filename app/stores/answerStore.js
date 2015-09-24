@@ -23,27 +23,22 @@ function recalculate() {
 var AnswerStore = Assign({}, EventEmitter.prototype, {
 
   emitChange: function() {
-    console.log("AnswerStore::emitChange");
     this.emit(CHANGE_EVENT);
   },
 
   getIncome: function() {
-    console.log("AnswerStore::getIncome");
     return _income;
   },
 
   getTotalIncome: function() {
-    console.log("AnswerStore::getTotalIncome");
     return _totalIncome;
   },
 
   addChangeListener: function(callback) {
-    console.log("AnswerStore::addChangeListener");
     this.on(CHANGE_EVENT, callback);
   },
 
   removeChangeListener: function(callback) {
-    console.log("AnswerStore::removeChangeListener");
     this.removeListener(CHANGE_EVENT, callback);
   }
 
@@ -55,7 +50,6 @@ Dispatcher.register(function(action) {
       _income = action.initialData.income;
       recalculate();
       AnswerStore.emitChange();
-      console.log("AnswerStore::emitChange(INITIALISE)");
     break;
 
     case ActionTypes.CHANGE_INCOME:
@@ -67,8 +61,6 @@ Dispatcher.register(function(action) {
       recalculate();
       AnswerStore.emitChange();
 
-      console.log("AnswerStore::emitChange(CHANGE_INCOME)");
-    break;
   }
 
 });

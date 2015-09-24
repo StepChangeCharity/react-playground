@@ -90,7 +90,6 @@ var income = React.createClass({
 
 		// we're only going to localStorage, so just save the whole thing
 		//Db.saveIncome(this.state.Income);
-		console.log("income::saveClient -> AnswerActions::saveIncome");
 		AnswerActions.saveIncome(this.state.Income);
 
 		// this.transitionTo("home");
@@ -102,8 +101,6 @@ var income = React.createClass({
 	},
 
 	render: function() {
-		console.log("income::render");
-
 		var formIsDirty;
 		if (this.state.dirty) {
 			formIsDirty = <span className='mui-pull-right form-dirty'>*</span>;

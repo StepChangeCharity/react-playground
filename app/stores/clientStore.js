@@ -24,7 +24,6 @@ Dispatcher.register(function(action) {
       _client = action.initialData.client;
       _income = action.initialData.income;
 
-      console.log("ClientStore.emitChange(INITIALISE)", "clientStore.js");
       //ClientStore.emitChange();
       break;
   }

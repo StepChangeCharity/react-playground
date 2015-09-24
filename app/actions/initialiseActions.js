@@ -6,7 +6,6 @@ var Db = require("../common/DB");
 
 var InitialiseActions = {
   initApp: function() {
-    console.log("initialiseActions::initApp -> dispatch(INITIALISE)");
     Dispatcher.dispatch({
       actionType: ActionTypes.INITIALISE,
       initialData: {

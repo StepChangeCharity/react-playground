@@ -25,7 +25,6 @@ var budgetSummary = React.createClass({
 	},
 
   render: function() {
-    console.log("budgetSummary::render");
     var income = <AmountSummary Amount={this.state.totalIncome} Frequency="Monthly" />
     var expenditure = <AmountSummary Amount={this.state.totalExpenditure} Frequency="Monthly" />
     var totalSurplus = this.state.totalIncome - this.state.totalExpenditure;
