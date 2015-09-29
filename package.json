@@ -15,7 +15,7 @@
     "flux": "^2.1.1",
     "react": "^0.13.3",
     "react-router": "^0.13.3",
-    "webpack": "^1.12.1"
+    "webpack": "^1.12.2"
   },
   "dependencies": {
     "react-router": "^0.13.3"
